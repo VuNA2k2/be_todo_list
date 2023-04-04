@@ -11,7 +11,7 @@ public class APIExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     public ErrorEntity handleAllException(Exception e) {
-        return new ErrorEntity(e.getMessage(), "500");
+        return new ErrorEntity("500", e.getMessage());
     }
 
     // TODO: Add more exception handler here

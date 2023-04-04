@@ -10,6 +10,6 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class ErrorEntity {
-    private String message;
     private String code;
+    private String message;
 }

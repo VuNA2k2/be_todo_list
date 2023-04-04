@@ -4,7 +4,6 @@ import com.backend.todolist.dto.accountdto.AccountInputDto;
 import com.backend.todolist.dto.accountdto.AccountOutputDto;
 import com.backend.todolist.entity.AccountEntity;
 import com.backend.todolist.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +12,6 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
 
     private final AccountRepository accountRepository;
-    @Autowired
     public AccountServiceImpl(AccountMapper accountMapper, AccountRepository accountRepository) {
         this.accountMapper = accountMapper;
         this.accountRepository = accountRepository;

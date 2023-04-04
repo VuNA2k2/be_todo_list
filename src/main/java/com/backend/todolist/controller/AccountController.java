@@ -4,7 +4,6 @@ import com.backend.todolist.dto.accountdto.AccountInputDto;
 import com.backend.todolist.dto.accountdto.AccountOutputDto;
 import com.backend.todolist.response.Response;
 import com.backend.todolist.service.account.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
     private final AccountService accountService;
 
-    @Autowired
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
@@ -35,6 +33,6 @@ public class AccountController {
     @DeleteMapping
     public Response deleteAccount(@RequestParam Long userId) {
         accountService.deleteAccount(userId);
-        return new Response("success", "Delete account successfully");
+        return Response.success();
     }
 }

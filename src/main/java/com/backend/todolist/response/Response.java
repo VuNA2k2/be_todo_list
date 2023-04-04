@@ -1,26 +1,36 @@
 package com.backend.todolist.response;
 
+import com.backend.todolist.utils.exception.ErrorEntity;
 import lombok.Builder;
 import lombok.Data;
 
 @Builder
 @Data
 public class Response<T> {
-    private String code;
-    private String message;
+    private ErrorEntity error;
     private T data;
 
-    public Response(String code, String message) {
-        this.code = code;
-        this.message = message;
+    public Response(ErrorEntity error) {
+        this.error = error;
     }
 
-    public Response(String code, String message, T data) {
-        this.code = code;
-        this.message = message;
+    public Response(ErrorEntity error, T data) {
+        this.error = error;
         this.data = data;
     }
 
     public Response() {
+    }
+
+    public static <T> Response<T> success(T data) {
+        return new Response(new ErrorEntity("success", "Thành công"), data);
+    }
+
+    public static <T> Response<T> success() {
+        return new Response(new ErrorEntity("success", "Thành công"));
+    }
+
+    public static <T> Response<T> fail(ErrorEntity error) {
+        return new Response(error);
     }
 }
