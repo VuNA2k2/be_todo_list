@@ -11,3 +11,7 @@ CREATE TABLE IF NOT EXISTS public.projects (
 );
 
 ALTER TABLE public.projects ALTER COLUMN user_id SET NOT NULL;
+
+ALTER TABLE public.projects ALTER COLUMN priority TYPE varchar;
+
+ALTER TABLE public.projects ALTER COLUMN deadline TYPE timestamptz;

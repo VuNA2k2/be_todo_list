@@ -13,3 +13,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
 	CONSTRAINT tasks_pkey PRIMARY KEY (id),
 	CONSTRAINT tasks_fkey_ref_projects FOREIGN KEY (project_id) REFERENCES public.projects(id)
 );
+
+ALTER TABLE public.tasks ALTER COLUMN deadline TYPE timestamptz;
+
+ALTER TABLE public.tasks ALTER COLUMN current_doing_time TYPE time;
