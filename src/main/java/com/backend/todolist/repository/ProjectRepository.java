@@ -12,4 +12,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     List<ProjectEntity> getAllByUserId(Long userId);
     void deleteById(Long id);
     ProjectEntity save(ProjectEntity projectEntity);
+
+    @Override
+    boolean existsById(Long id);
 }

@@ -14,7 +14,6 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class ProjectInputDto {
-    private Long id;
     private Long userId;
     private String name;
     private String description;
