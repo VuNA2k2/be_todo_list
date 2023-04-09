@@ -10,6 +10,7 @@ import java.util.List;
 public interface ProjectService {
     List<ProjectOutputDto> getAllByUserId(Long userId);
     ProjectDetailOutputDto getProjectDetailById(Long projectId);
+    ProjectOutputDto getProjectById(Long projectId);
     ProjectDetailOutputDto createProject(ProjectInputDto projectInputDto) throws RestException;
     ProjectDetailOutputDto updateProject(ProjectInputDto projectInputDto, Long projectId);
     void deleteProject(Long projectId);

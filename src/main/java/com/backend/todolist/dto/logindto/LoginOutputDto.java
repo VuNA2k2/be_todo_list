@@ -1,4 +1,4 @@
-package com.backend.todolist.dto.authendto;
+package com.backend.todolist.dto.logindto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

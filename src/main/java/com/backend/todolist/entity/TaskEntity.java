@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalTime;
+import java.sql.Time;
 import java.time.OffsetDateTime;
 
 
@@ -34,7 +34,7 @@ public class TaskEntity {
     private Long numberOfPomodoro;
     private OffsetDateTime deadline;
     @Column(name = "current_doing_time")
-    private LocalTime currentDoingTime;
+    private Time currentDoingTime;
     @Convert(converter = BitBooleanConverter.class)
     private boolean reminder;
     @Convert(converter = StatusConverter.class)

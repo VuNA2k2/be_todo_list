@@ -5,6 +5,7 @@ import com.backend.todolist.dto.projectdto.ProjectInputDto;
 import com.backend.todolist.dto.projectdto.ProjectOutputDto;
 import com.backend.todolist.entity.ProjectEntity;
 import com.backend.todolist.repository.ProjectRepository;
+import com.backend.todolist.service.task.TaskService;
 import com.backend.todolist.utils.exception.Errors;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +21,12 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper projectMapper;
     private final ProjectRepository projectRepository;
 
-    public ProjectServiceImpl(ProjectMapper projectMapper, ProjectRepository projectRepository) {
+    private final TaskService taskService;
+
+    public ProjectServiceImpl(ProjectMapper projectMapper, ProjectRepository projectRepository, TaskService taskService) {
         this.projectMapper = projectMapper;
         this.projectRepository = projectRepository;
+        this.taskService = taskService;
     }
 
     @Override
@@ -41,6 +45,11 @@ public class ProjectServiceImpl implements ProjectService {
             throw Errors.PROJECT_NOT_FOUND;
         }
         return getProjectDetailOutputDtoFromProjectEntity(projectRepository.getById(projectId));
+    }
+
+    @Override
+    public ProjectOutputDto getProjectById(Long projectId) {
+        return getProjectOutputDtoFromProjectEntity(projectRepository.getById(projectId));
     }
 
     @Override
@@ -76,7 +85,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectDetailOutputDto getProjectDetailOutputDtoFromProjectEntity(ProjectEntity projectEntity) {
         ProjectDetailOutputDto projectDetailOutputDto = projectMapper.getProjectDetailOutputDtoFromProjectEntity(projectEntity);
-        projectDetailOutputDto.setTasks(List.of()).setNotes(List.of());
+        projectDetailOutputDto.setTasks(taskService.getAllTaskByProjectId(projectEntity.getId())).setNotes(List.of());
         return projectDetailOutputDto;
     }
 
