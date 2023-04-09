@@ -4,9 +4,12 @@ import com.backend.todolist.dto.projectdto.ProjectDetailOutputDto;
 import com.backend.todolist.dto.projectdto.ProjectInputDto;
 import com.backend.todolist.dto.projectdto.ProjectOutputDto;
 import com.backend.todolist.entity.ProjectEntity;
+import com.backend.todolist.entity.UserDetailEntity;
 import com.backend.todolist.repository.ProjectRepository;
 import com.backend.todolist.service.task.TaskService;
 import com.backend.todolist.utils.exception.Errors;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -40,20 +43,23 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDetailOutputDto getProjectDetailById(Long projectId) {
+    public ProjectDetailOutputDto getProjectDetailById(Long projectId, Long userId) {
         if(!projectRepository.existsById(projectId)) {
             throw Errors.PROJECT_NOT_FOUND;
         }
-        return getProjectDetailOutputDtoFromProjectEntity(projectRepository.getById(projectId));
+        return getProjectDetailOutputDtoFromProjectEntity(projectRepository.getByIdAndUserId(projectId, userId));
     }
 
     @Override
-    public ProjectOutputDto getProjectById(Long projectId) {
-        return getProjectOutputDtoFromProjectEntity(projectRepository.getById(projectId));
+    public ProjectOutputDto getProjectById(Long projectId, Long userId) {
+        return getProjectOutputDtoFromProjectEntity(projectRepository.getByIdAndUserId(projectId, userId));
     }
 
     @Override
-    public ProjectDetailOutputDto createProject(ProjectInputDto projectInputDto) {
+    public ProjectDetailOutputDto createProject(ProjectInputDto projectInputDto, Long userId) {
+        if(projectInputDto.getUserId() != userId) {
+            throw Errors.USER_NOT_FOUND;
+        }
         ProjectEntity projectEntity = projectMapper.getProjectEntityFromProjectInputDto(projectInputDto);
         if(projectEntity.getDeadline().isBefore(OffsetDateTime.now())) {
             throw Errors.PROJECT_DEADLINE_IS_BEFORE_NOW;
@@ -62,7 +68,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDetailOutputDto updateProject(ProjectInputDto projectInputDto, Long projectId) {
+    public ProjectDetailOutputDto updateProject(ProjectInputDto projectInputDto, Long projectId, Long userId) {
+        if(projectInputDto.getUserId() != userId) {
+            throw Errors.USER_NOT_FOUND;
+        }
         ProjectEntity projectEntity = projectMapper.getProjectEntityFromProjectInputDto(projectInputDto);
         projectEntity.setId(projectId);
         if(!projectRepository.existsById(projectEntity.getId())) {
@@ -75,8 +84,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteProject(Long projectId) {
-        if(!projectRepository.existsById(projectId)) {
+    public void deleteProject(Long projectId, Long userId) {
+        if(!projectRepository.existsByIdAndUserId(projectId, userId)) {
             throw Errors.PROJECT_NOT_FOUND;
         }
         projectRepository.deleteById(projectId);

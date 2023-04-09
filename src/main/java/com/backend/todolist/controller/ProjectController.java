@@ -3,9 +3,11 @@ package com.backend.todolist.controller;
 import com.backend.todolist.dto.projectdto.ProjectDetailOutputDto;
 import com.backend.todolist.dto.projectdto.ProjectInputDto;
 import com.backend.todolist.dto.projectdto.ProjectOutputDto;
+import com.backend.todolist.entity.UserDetailEntity;
 import com.backend.todolist.response.Pagination;
 import com.backend.todolist.response.Response;
 import com.backend.todolist.service.project.ProjectService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,30 +22,36 @@ public class ProjectController {
     }
     @GetMapping
     Response<Pagination<ProjectOutputDto>> getAllProjects() {
-        // TODO: hard code userId
-        Long userId = 1L;
-        List<ProjectOutputDto> projectOutputList = projectService.getAllByUserId(userId);
+        UserDetailEntity userDetailEntity = getUserDetailEntity();
+        List<ProjectOutputDto> projectOutputList = projectService.getAllByUserId(userDetailEntity.getAccount().getUserId());
         return Response.success(new Pagination<>(projectOutputList.size(), projectOutputList));
     }
     @PostMapping
     Response<ProjectDetailOutputDto> createProject(@RequestBody ProjectInputDto projectInputDto) {
-        Long userId = 1L;
-        ProjectDetailOutputDto projectDetailOutputDto = projectService.createProject(projectInputDto);
+        UserDetailEntity userDetailEntity = getUserDetailEntity();
+        ProjectDetailOutputDto projectDetailOutputDto = projectService.createProject(projectInputDto, userDetailEntity.getAccount().getUserId());
         return Response.success(projectDetailOutputDto);
     }
     @PutMapping
     Response<ProjectDetailOutputDto> updateProject(@RequestBody ProjectInputDto projectInputDto, @RequestParam Long id) {
-        ProjectDetailOutputDto projectDetailOutputDto = projectService.updateProject(projectInputDto, id);
+        UserDetailEntity userDetailEntity = getUserDetailEntity();
+        ProjectDetailOutputDto projectDetailOutputDto = projectService.updateProject(projectInputDto, id, userDetailEntity.getAccount().getUserId());
         return Response.success(projectDetailOutputDto);
     }
     @DeleteMapping
     Response deleteProject(@RequestParam Long id) {
-        projectService.deleteProject(id);
+        UserDetailEntity userDetailEntity = getUserDetailEntity();
+        projectService.deleteProject(id, userDetailEntity.getAccount().getUserId());
         return Response.success();
     }
     @GetMapping("/detail")
     Response<ProjectDetailOutputDto> getDetailProject(@RequestParam Long id) {
-        ProjectDetailOutputDto projectDetailOutputDto = projectService.getProjectDetailById(id);
+        UserDetailEntity userDetailEntity = getUserDetailEntity();
+        ProjectDetailOutputDto projectDetailOutputDto = projectService.getProjectDetailById(id, userDetailEntity.getAccount().getUserId());
         return Response.success(projectDetailOutputDto);
+    }
+
+    private UserDetailEntity getUserDetailEntity() {
+        return (UserDetailEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

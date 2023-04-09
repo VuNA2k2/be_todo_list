@@ -8,11 +8,12 @@ import java.util.List;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
-    ProjectEntity getById(Long id);
+    ProjectEntity getByIdAndUserId(Long id, Long userId);
     List<ProjectEntity> getAllByUserId(Long userId);
     void deleteById(Long id);
     ProjectEntity save(ProjectEntity projectEntity);
 
     @Override
     boolean existsById(Long id);
+    boolean existsByIdAndUserId(Long id, Long userId);
 }

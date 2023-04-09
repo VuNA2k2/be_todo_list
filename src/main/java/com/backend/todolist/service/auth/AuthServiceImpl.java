@@ -3,8 +3,7 @@ package com.backend.todolist.service.auth;
 import com.backend.todolist.dto.logindto.LoginInputDto;
 import com.backend.todolist.dto.logindto.LoginOutputDto;
 import com.backend.todolist.entity.UserDetailEntity;
-import com.backend.todolist.utils.provider.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.backend.todolist.service.jwt.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,11 +14,11 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider tokenProvider;
+    private final JwtService jwtService;
 
-    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider) {
+    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtService tokenProvider) {
         this.authenticationManager = authenticationManager;
-        this.tokenProvider = tokenProvider;
+        this.jwtService = tokenProvider;
     }
 
     @Override
@@ -31,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken((UserDetailEntity) authentication.getPrincipal());
+        String jwt = jwtService.generateToken((UserDetailEntity) authentication.getPrincipal());
         return new LoginOutputDto(jwt, jwt);
     }
 }

@@ -71,7 +71,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDetailOutputDto getTaskDetailOutputDtoFromTaskEntity(TaskEntity taskEntity) {
         TaskDetailOutputDto taskDetailOutputDto = taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskEntity);
-        taskDetailOutputDto.setProject(projectService.getProjectById(taskEntity.getProjectId()));
+        // TODO: hard code userId
+        taskDetailOutputDto.setProject(projectService.getProjectById(taskEntity.getProjectId(), 1L));
         return taskDetailOutputDto;
     }
 }

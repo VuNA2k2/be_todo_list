@@ -9,4 +9,5 @@ public interface Errors {
     RestException PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE = new RestException("4", "PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE");
     RestException INVALID_TOKEN = new RestException("5", "INVALID_TOKEN");
     RestException TOKEN_EXPIRED = new RestException("6", "TOKEN_EXPIRED");
+    RestException USER_NOT_FOUND = new RestException("7", "USER_NOT_FOUND");
 }

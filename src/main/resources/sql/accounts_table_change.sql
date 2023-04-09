@@ -6,3 +6,7 @@ CREATE TABLE public.accounts (
 );
 
 ALTER TABLE public.accounts ALTER COLUMN password SET NOT NULL;
+
+ALTER TABLE public.accounts ALTER COLUMN password TYPE varchar;
+
+ALTER TABLE public.accounts ALTER COLUMN user_id DROP IDENTITY;

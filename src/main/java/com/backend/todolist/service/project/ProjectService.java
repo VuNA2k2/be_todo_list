@@ -9,11 +9,11 @@ import com.backend.todolist.utils.exception.RestException;
 import java.util.List;
 public interface ProjectService {
     List<ProjectOutputDto> getAllByUserId(Long userId);
-    ProjectDetailOutputDto getProjectDetailById(Long projectId);
-    ProjectOutputDto getProjectById(Long projectId);
-    ProjectDetailOutputDto createProject(ProjectInputDto projectInputDto) throws RestException;
-    ProjectDetailOutputDto updateProject(ProjectInputDto projectInputDto, Long projectId);
-    void deleteProject(Long projectId);
+    ProjectDetailOutputDto getProjectDetailById(Long projectId, Long userId);
+    ProjectOutputDto getProjectById(Long projectId, Long userId);
+    ProjectDetailOutputDto createProject(ProjectInputDto projectInputDto, Long userId) throws RestException;
+    ProjectDetailOutputDto updateProject(ProjectInputDto projectInputDto, Long projectId, Long userId);
+    void deleteProject(Long projectId, Long userId);
     ProjectDetailOutputDto getProjectDetailOutputDtoFromProjectEntity(ProjectEntity projectEntity);
 
     ProjectOutputDto getProjectOutputDtoFromProjectEntity(ProjectEntity projectEntity);
