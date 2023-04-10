@@ -12,12 +12,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "accounts")
 public class AccountEntity {
     @Column(name = "user_name", nullable = false, unique = true)
-    private String userName;
+    private String username;
     @Column(name = "password", nullable = false)
     private String password;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
 }

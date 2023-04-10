@@ -1,16 +1,15 @@
 package com.backend.todolist.entity;
 
-import com.backend.todolist.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
+
 public class UserDetailEntity implements UserDetails {
     private final AccountEntity account;
+
     public UserDetailEntity(AccountEntity account) {
         this.account = account;
     }
@@ -31,7 +30,7 @@ public class UserDetailEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return account.getUserName();
+        return account.getUsername();
     }
 
     @Override

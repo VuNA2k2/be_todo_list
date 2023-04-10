@@ -1,4 +1,4 @@
-package com.backend.todolist.dto.userdto;
+package com.backend.todolist.dto.registerdto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,15 +8,14 @@ import lombok.experimental.Accessors;
 import java.util.Date;
 
 @Data
-@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserInputDto {
+@Accessors(chain = true)
+public class RegisterOutputDto {
     private String username;
+    private String email;
     private String fullName;
-
     private Date dateOfBirth;
     private String phoneNumber;
-    private String email;
     private String avatar;
 }

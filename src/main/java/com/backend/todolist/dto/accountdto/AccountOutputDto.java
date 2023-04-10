@@ -7,6 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 public class AccountOutputDto {
     private Long userId;
-    private String userName;
+    private String username;
     private String password;
 }

@@ -7,13 +7,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
     AccountEntity getByUserId(Long userId);
-    AccountEntity getByUserName(String userName);
+    AccountEntity getByUsername(String username);
 
     AccountEntity save(AccountEntity accountEntity);
 
     boolean existsAccountEntitiesByUserId(Long userId);
 
-    boolean existsAccountEntitiesByUserName(String userName);
+    boolean existsAccountEntitiesByUsername(String username);
 
-    boolean existsAccountEntitiesByUserNameAndUserId(String userName, Long userId);
+    boolean existsAccountEntitiesByUsernameAndUserId(String userName, Long userId);
 }

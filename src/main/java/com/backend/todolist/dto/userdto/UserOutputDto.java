@@ -11,5 +11,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class UserOutputDto {
     private String userId;
-    private String userName;
+    private String username;
 }

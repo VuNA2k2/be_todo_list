@@ -10,3 +10,5 @@ ALTER TABLE public.accounts ALTER COLUMN password SET NOT NULL;
 ALTER TABLE public.accounts ALTER COLUMN password TYPE varchar;
 
 ALTER TABLE public.accounts ALTER COLUMN user_id DROP IDENTITY;
+
+ALTER TABLE public.accounts ADD CONSTRAINT accounts_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);

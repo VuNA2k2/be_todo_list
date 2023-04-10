@@ -10,8 +10,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class UserDetailOutputDto {
-    private String userId;
-    private String userName;
+    private Long userId;
+    private String username;
     private String fullName;
     private String dateOfBirth;
     private String phoneNumber;

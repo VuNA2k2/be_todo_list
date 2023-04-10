@@ -10,4 +10,8 @@ public interface Errors {
     RestException INVALID_TOKEN = new RestException("5", "INVALID_TOKEN");
     RestException TOKEN_EXPIRED = new RestException("6", "TOKEN_EXPIRED");
     RestException USER_NOT_FOUND = new RestException("7", "USER_NOT_FOUND");
+    RestException USERID_EXISTED = new RestException("8", "USERID_EXISTED");
+    RestException USERNAME_NOT_FOUND = new RestException("9", "USERNAME_NOT_FOUND");
+    RestException PASSWORD_NOT_MATCH = new RestException("10", "PASSWORD_NOT_MATCH");
+    RestException USERNAME_EXISTED = new RestException("11", "USERNAME_EXISTED");
 }

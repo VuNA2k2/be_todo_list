@@ -9,6 +9,6 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class LoginInputDto {
-    private String userName;
+    private String username;
     private String password;
 }

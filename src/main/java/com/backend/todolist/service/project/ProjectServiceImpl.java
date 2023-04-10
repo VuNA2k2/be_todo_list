@@ -4,12 +4,9 @@ import com.backend.todolist.dto.projectdto.ProjectDetailOutputDto;
 import com.backend.todolist.dto.projectdto.ProjectInputDto;
 import com.backend.todolist.dto.projectdto.ProjectOutputDto;
 import com.backend.todolist.entity.ProjectEntity;
-import com.backend.todolist.entity.UserDetailEntity;
 import com.backend.todolist.repository.ProjectRepository;
 import com.backend.todolist.service.task.TaskService;
 import com.backend.todolist.utils.exception.Errors;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -74,7 +71,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         ProjectEntity projectEntity = projectMapper.getProjectEntityFromProjectInputDto(projectInputDto);
         projectEntity.setId(projectId);
-        if(!projectRepository.existsById(projectEntity.getId())) {
+        if(!projectRepository.existsByIdAndUserId(projectEntity.getId(), userId)) {
             throw Errors.PROJECT_NOT_FOUND;
         }
         if(projectEntity.getDeadline().isBefore(OffsetDateTime.now())) {

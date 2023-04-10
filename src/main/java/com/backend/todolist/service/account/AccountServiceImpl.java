@@ -4,6 +4,7 @@ import com.backend.todolist.dto.accountdto.AccountInputDto;
 import com.backend.todolist.dto.accountdto.AccountOutputDto;
 import com.backend.todolist.entity.AccountEntity;
 import com.backend.todolist.repository.AccountRepository;
+import com.backend.todolist.utils.exception.Errors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +20,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountEntity createAccount(AccountInputDto inputDto) {
+        if(accountRepository.existsAccountEntitiesByUsername(inputDto.getUsername()))
+            throw Errors.USERNAME_EXISTED;
+        if(accountRepository.existsAccountEntitiesByUserId(inputDto.getUserId()))
+            throw Errors.USERID_EXISTED;
         return accountRepository.save(accountMapper.getEntityFromInput(inputDto));
     }
 
@@ -30,7 +35,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountEntity updateAccount(Long userId, AccountInputDto inputDto) {
         AccountEntity accountEntity = accountRepository.getByUserId(userId);
-        accountEntity.setUserName(inputDto.getUserName());
+        accountEntity.setUsername(inputDto.getUsername());
         accountEntity.setPassword(inputDto.getPassword());
         return accountRepository.save(accountEntity);
     }
@@ -49,7 +54,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountEntity getAccount(String userName) {
-        return accountRepository.getByUserName(userName);
+        return accountRepository.getByUsername(userName);
     }
 
     @Override

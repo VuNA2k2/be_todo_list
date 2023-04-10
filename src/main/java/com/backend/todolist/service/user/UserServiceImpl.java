@@ -5,7 +5,10 @@ import com.backend.todolist.dto.userdto.UserInputDto;
 import com.backend.todolist.dto.userdto.UserOutputDto;
 import com.backend.todolist.entity.UserEntity;
 import com.backend.todolist.repository.UserRepository;
+import com.backend.todolist.utils.exception.Errors;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     UserMapper userMapper;
@@ -17,8 +20,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailOutputDto createUser(UserInputDto userInputDto) {
-        if(userRepository.existsUserEntitiesByUserName(userInputDto.getUserName())) {
-            throw new RuntimeException("User name is already existed");
+        if(userRepository.existsUserEntitiesByUsername(userInputDto.getUsername())) {
+            throw Errors.USERNAME_EXISTED;
         }
         UserEntity userEntity = userMapper.getUserEntityFromUserInputDto(userInputDto);
         return userMapper.getUserDetailOutputDtoFromUserEntity(userRepository.save(userEntity));

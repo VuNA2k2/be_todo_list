@@ -9,3 +9,5 @@ CREATE TABLE IF NOT EXISTS public.users (
 	CONSTRAINT users_pkey PRIMARY KEY (user_id),
 	CONSTRAINT users_fkey FOREIGN KEY (user_id) REFERENCES public.accounts(user_id)
 );
+
+ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_fkey;
