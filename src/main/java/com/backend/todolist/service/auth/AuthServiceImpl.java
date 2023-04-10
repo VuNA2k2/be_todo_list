@@ -60,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
         UserDetailOutputDto userDetailOutputDto = userService.createUser(userInputDto);
         accountInputDto.setUserId(userDetailOutputDto.getUserId());
         accountInputDto.setPassword(passwordEncoder.encode(registerInputDto.getPassword()));
+        System.out.println(accountInputDto.getPassword());
         accountService.createAccount(accountInputDto);
         accountMapper.getEntityFromInput(accountInputDto);
         return authMapper.getRegisterOutputDtoFromUserDetailOutputDto(userDetailOutputDto);

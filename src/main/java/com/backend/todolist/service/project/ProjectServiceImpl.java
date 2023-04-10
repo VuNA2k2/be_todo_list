@@ -41,7 +41,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDetailOutputDto getProjectDetailById(Long projectId, Long userId) {
-        if(!projectRepository.existsById(projectId)) {
+        if(!projectRepository.existsByIdAndUserId(projectId, userId)) {
             throw Errors.PROJECT_NOT_FOUND;
         }
         return getProjectDetailOutputDtoFromProjectEntity(projectRepository.getByIdAndUserId(projectId, userId));
@@ -54,10 +54,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDetailOutputDto createProject(ProjectInputDto projectInputDto, Long userId) {
-        if(projectInputDto.getUserId() != userId) {
-            throw Errors.USER_NOT_FOUND;
-        }
         ProjectEntity projectEntity = projectMapper.getProjectEntityFromProjectInputDto(projectInputDto);
+        projectEntity.setUserId(userId);
         if(projectEntity.getDeadline().isBefore(OffsetDateTime.now())) {
             throw Errors.PROJECT_DEADLINE_IS_BEFORE_NOW;
         }
@@ -66,17 +64,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDetailOutputDto updateProject(ProjectInputDto projectInputDto, Long projectId, Long userId) {
-        if(projectInputDto.getUserId() != userId) {
-            throw Errors.USER_NOT_FOUND;
-        }
-        ProjectEntity projectEntity = projectMapper.getProjectEntityFromProjectInputDto(projectInputDto);
-        projectEntity.setId(projectId);
-        if(!projectRepository.existsByIdAndUserId(projectEntity.getId(), userId)) {
+        if(!projectRepository.existsByIdAndUserId(projectId, userId)) {
             throw Errors.PROJECT_NOT_FOUND;
         }
+        ProjectEntity projectEntity = projectMapper.getProjectEntityFromProjectInputDto(projectInputDto);
         if(projectEntity.getDeadline().isBefore(OffsetDateTime.now())) {
             throw Errors.PROJECT_DEADLINE_IS_BEFORE_NOW;
         }
+        projectEntity.setUserId(userId);
+        projectEntity.setId(projectId);
         return getProjectDetailOutputDtoFromProjectEntity(projectRepository.save(projectEntity));
     }
 
