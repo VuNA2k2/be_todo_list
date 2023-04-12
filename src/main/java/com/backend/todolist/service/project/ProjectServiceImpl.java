@@ -41,7 +41,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDetailOutputDto getProjectDetailById(Long projectId, Long userId) {
-        if(!projectRepository.existsByIdAndUserId(projectId, userId)) {
+        if(!isProjectExist(projectId, userId)) {
             throw Errors.PROJECT_NOT_FOUND;
         }
         return getProjectDetailOutputDtoFromProjectEntity(projectRepository.getByIdAndUserId(projectId, userId));
@@ -49,7 +49,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectOutputDto getProjectById(Long projectId, Long userId) {
+        if(!isProjectExist(projectId, userId)) {
+            throw Errors.PROJECT_NOT_FOUND;
+        }
         return getProjectOutputDtoFromProjectEntity(projectRepository.getByIdAndUserId(projectId, userId));
+    }
+
+    @Override
+    public ProjectOutputDto getProjectById(Long projectId) {
+        return getProjectOutputDtoFromProjectEntity(projectRepository.getById(projectId));
     }
 
     @Override
@@ -64,7 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDetailOutputDto updateProject(ProjectInputDto projectInputDto, Long projectId, Long userId) {
-        if(!projectRepository.existsByIdAndUserId(projectId, userId)) {
+        if(!isProjectExist(projectId, userId)) {
             throw Errors.PROJECT_NOT_FOUND;
         }
         ProjectEntity projectEntity = projectMapper.getProjectEntityFromProjectInputDto(projectInputDto);
@@ -78,7 +86,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteProject(Long projectId, Long userId) {
-        if(!projectRepository.existsByIdAndUserId(projectId, userId)) {
+        if(!isProjectExist(projectId, userId)) {
             throw Errors.PROJECT_NOT_FOUND;
         }
         projectRepository.deleteById(projectId);
@@ -97,6 +105,14 @@ public class ProjectServiceImpl implements ProjectService {
         // TODO: get all task by project id and set progress
         projectOutputDto.setProgress(0.0);
         return projectOutputDto;
+    }
 
+    @Override
+    public boolean isProjectExist(Long projectId, Long userId) {
+        return projectRepository.existsByIdAndUserId(projectId, userId);
+    }
+
+    public boolean isProjectExist(Long projectId) {
+        return projectRepository.existsById(projectId);
     }
 }
