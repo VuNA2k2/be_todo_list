@@ -1,12 +1,14 @@
 package com.backend.todolist.controller;
 
-import com.backend.todolist.dto.projectdto.ProjectDetailOutputDto;
 import com.backend.todolist.dto.projectdto.ProjectInputDto;
 import com.backend.todolist.dto.projectdto.ProjectOutputDto;
+import com.backend.todolist.dto.searchdto.SearchInputDto;
 import com.backend.todolist.entity.UserDetailEntity;
 import com.backend.todolist.response.Pagination;
 import com.backend.todolist.response.Response;
 import com.backend.todolist.service.project.ProjectService;
+import org.hibernate.annotations.Parameter;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,35 +22,34 @@ public class ProjectController {
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
-    @GetMapping
-    Response<Pagination<ProjectOutputDto>> getAllProjects() {
+    @GetMapping("/search")
+    Response<Pagination<ProjectOutputDto>> getAllProjects(Pageable pageable,SearchInputDto search) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
-        List<ProjectOutputDto> projectOutputList = projectService.getAllByUserId(userDetailEntity.getAccount().getUserId());
-        return Response.success(new Pagination<>(projectOutputList.size(), projectOutputList));
+        return Response.success(projectService.getAllByUserId(userDetailEntity.getAccount().getUserId(), pageable, search));
+    }
+    @GetMapping
+    Response<ProjectOutputDto> getProjectById(@RequestParam Long id) {
+        UserDetailEntity userDetailEntity = getUserDetailEntity();
+        ProjectOutputDto ProjectOutputDto = projectService.getProjectById(id, userDetailEntity.getAccount().getUserId());
+        return Response.success(ProjectOutputDto);
     }
     @PostMapping
-    Response<ProjectDetailOutputDto> createProject(@RequestBody ProjectInputDto projectInputDto) {
+    Response<ProjectOutputDto> createProject(@RequestBody ProjectInputDto projectInputDto) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
-        ProjectDetailOutputDto projectDetailOutputDto = projectService.createProject(projectInputDto, userDetailEntity.getAccount().getUserId());
-        return Response.success(projectDetailOutputDto);
+        ProjectOutputDto ProjectOutputDto = projectService.createProject(projectInputDto, userDetailEntity.getAccount().getUserId());
+        return Response.success(ProjectOutputDto);
     }
     @PutMapping
-    Response<ProjectDetailOutputDto> updateProject(@RequestBody ProjectInputDto projectInputDto, @RequestParam Long id) {
+    Response<ProjectOutputDto> updateProject(@RequestBody ProjectInputDto projectInputDto, @RequestParam Long id) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
-        ProjectDetailOutputDto projectDetailOutputDto = projectService.updateProject(projectInputDto, id, userDetailEntity.getAccount().getUserId());
-        return Response.success(projectDetailOutputDto);
+        ProjectOutputDto ProjectOutputDto = projectService.updateProject(projectInputDto, id, userDetailEntity.getAccount().getUserId());
+        return Response.success(ProjectOutputDto);
     }
     @DeleteMapping
     Response deleteProject(@RequestParam Long id) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
         projectService.deleteProject(id, userDetailEntity.getAccount().getUserId());
         return Response.success();
-    }
-    @GetMapping("/detail")
-    Response<ProjectDetailOutputDto> getDetailProject(@RequestParam Long id) {
-        UserDetailEntity userDetailEntity = getUserDetailEntity();
-        ProjectDetailOutputDto projectDetailOutputDto = projectService.getProjectDetailById(id, userDetailEntity.getAccount().getUserId());
-        return Response.success(projectDetailOutputDto);
     }
 
     private UserDetailEntity getUserDetailEntity() {
