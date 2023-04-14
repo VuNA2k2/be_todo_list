@@ -1,5 +1,6 @@
 package com.backend.todolist.utils.exception;
 
+import com.backend.todolist.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -14,18 +15,18 @@ import static org.springframework.http.HttpStatus.OK;
 public class APIExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(INTERNAL_SERVER_ERROR)
-    public ErrorEntity handleAllException(Exception e) {
-        return new ErrorEntity("500", e.getMessage());
+    public Response<ErrorEntity> handleAllException(Exception e) {
+        return new Response<>(new ErrorEntity("500", e.getMessage()));
     }
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(OK)
-    public ErrorEntity handleAuthenticationException(Exception e) {
-        return new ErrorEntity("401", e.getMessage());
+    public Response<ErrorEntity> handleAuthenticationException(Exception e) {
+        return new Response<>(new ErrorEntity("401", e.getMessage()));
     }
     @ExceptionHandler(RestException.class)
     @ResponseStatus(OK)
-    public ErrorEntity handleRestException(RestException e) {
-        return new ErrorEntity(e.getCode(), e.getMessage());
+    public Response<ErrorEntity> handleRestException(RestException e) {
+        return new Response<>(new ErrorEntity(e.getCode(), e.getMessage()));
     }
 
     // TODO: Add more exception handler here
