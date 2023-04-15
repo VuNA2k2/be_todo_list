@@ -5,6 +5,7 @@ import com.backend.todolist.dto.logindto.LoginOutputDto;
 import com.backend.todolist.dto.registerdto.RegisterInputDto;
 import com.backend.todolist.dto.registerdto.RegisterOutputDto;
 import com.backend.todolist.service.auth.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    RegisterOutputDto register(@RequestBody RegisterInputDto registerInputDto) {
+    RegisterOutputDto register(@RequestBody @Valid RegisterInputDto registerInputDto) {
         return authService.register(registerInputDto);
     }
 }

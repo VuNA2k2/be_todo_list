@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +41,8 @@ public class ProjectServiceImpl implements ProjectService {
         if (!isProjectExist(projectId, userId)) {
             throw Errors.PROJECT_NOT_FOUND;
         }
-        return getProjectOutputDtoFromProjectEntity(projectRepository.findAllById(projectId));
+        ProjectEntity entity = projectRepository.findById(projectId).get();
+        return getProjectOutputDtoFromProjectEntity(entity);
     }
 
     @Override

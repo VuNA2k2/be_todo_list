@@ -8,11 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
+
 
 @Repository
 public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
-    TaskEntity getById(Long taskId);
+    Optional<TaskEntity> findById(Long taskId);
 
     void deleteById(Long taskId);
 
@@ -20,16 +21,18 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
 
     boolean existsById(Long taskId);
 
+    @Query("SELECT COUNT(*) > 0 FROM TaskEntity t JOIN UserEntity u WHERE t.id = :taskId AND u.userId = :userId")
     boolean existsByIdAndUserId(Long taskId, Long userId);
 
-    List<TaskEntity> getAllByProjectId(Long projectId);
+    boolean existsByIdAndProjectId(Long taskId, Long projectId);
 
-    Page<TaskEntity> getAllByProjectId(Pageable pageable, Long projectId);
+    @Query(value = "SELECT t FROM TaskEntity t JOIN ProjectEntity p " +
+            "ON p.id = :projectId AND t.projectId = p.id WHERE p.userId = :userId " +
+            "AND UPPER(t.title) LIKE UPPER(CONCAT('%', :title, '%'))")
+    Page<TaskEntity> searchInProject(Long projectId, String title, Long userId, Pageable pageable);
 
-    @Query("SELECT t FROM TaskEntity t JOIN ProjectEntity p WHERE p.userId = :userId")
-    List<TaskEntity> getAllByUserId(@Param("userId") Long userId);
-
-    @Query(value = "SELECT t FROM TaskEntity t JOIN ProjectEntity p WHERE p.userId = :userId",
-            countQuery = "SELECT count(t) FROM TaskEntity t JOIN ProjectEntity p WHERE p.userId = :userId")
-    Page<TaskEntity> getAllByUserId(@Param("pageable") Pageable pageable, @Param("userId") Long userId);
+    @Query(value = "SELECT t FROM TaskEntity t JOIN ProjectEntity p "+
+            "ON t.projectId = p.id WHERE p.userId = :userId "+
+            "AND UPPER(t.title) LIKE UPPER(CONCAT('%', :title, '%'))")
+    Page<TaskEntity> searchInUser(@Param("userId") Long userId, @Param("title") String title, Pageable pageable);
 }

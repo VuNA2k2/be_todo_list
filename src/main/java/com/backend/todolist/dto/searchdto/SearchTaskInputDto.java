@@ -9,6 +9,6 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class SearchTaskInputDto extends SearchInputDto {
-    private Long projectIds;
+    private Long projectId;
     private Status statuses;
 }

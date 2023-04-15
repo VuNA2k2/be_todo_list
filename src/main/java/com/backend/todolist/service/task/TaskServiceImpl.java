@@ -1,18 +1,20 @@
 package com.backend.todolist.service.task;
 
+import com.backend.todolist.dto.searchdto.SearchTaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskDetailOutputDto;
 import com.backend.todolist.dto.taskdto.TaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskOutputDto;
+import com.backend.todolist.entity.ProjectEntity;
 import com.backend.todolist.entity.TaskEntity;
+import com.backend.todolist.repository.ProjectRepository;
 import com.backend.todolist.repository.TaskRepository;
-import com.backend.todolist.service.project.ProjectService;
+import com.backend.todolist.response.Pagination;
 import com.backend.todolist.utils.exception.Errors;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,84 +22,77 @@ public class TaskServiceImpl implements TaskService {
     private final TaskMapper taskMapper;
     private final TaskRepository taskRepository;
 
-    private final ProjectService projectService;
+    private final ProjectRepository projectRepository;
 
-    public TaskServiceImpl(TaskMapper taskMapper, TaskRepository taskRepository,@Lazy ProjectService projectService) {
+    public TaskServiceImpl(TaskMapper taskMapper, TaskRepository taskRepository, ProjectRepository projectRepository) {
         this.taskMapper = taskMapper;
         this.taskRepository = taskRepository;
-        this.projectService = projectService;
+        this.projectRepository = projectRepository;
     }
 
-    @Override
-    public List<TaskOutputDto> getAllTaskByProjectId(Long projectId, Long userId) {
-        if (!projectService.isProjectExist(projectId, userId)) {
-            throw Errors.PROJECT_NOT_FOUND;
-        }
-        return Optional.of(taskRepository.getAllByProjectId(projectId).stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()))
-                .orElse(List.of());
-    }
-
-    @Override
-    public List<TaskOutputDto> getAllTaskByProjectId(Long projectId) {
-        if(!projectService.isProjectExist(projectId)) {
-            throw Errors.PROJECT_NOT_FOUND;
-        }
-        return Optional.of(taskRepository.getAllByProjectId(projectId).stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()))
-                .orElse(List.of());
-    }
 
     @Override
     public TaskDetailOutputDto getTaskDetail(Long taskId, Long userId) {
-        if(!isTaskExist(taskId, userId)) {
-            throw Errors.TASK_NOT_FOUND;
-        }
-        return taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskRepository.getById(taskId));
-    }
-
-    @Override
-    public TaskDetailOutputDto createTask(TaskInputDto taskInputDto, Long userId) {
-        TaskEntity taskEntity = taskMapper.getTaskEntityFromTaskInputDto(taskInputDto);
-        if (taskEntity.getDeadline().isBefore(OffsetDateTime.now())) {
-            throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
-        }
-        return taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskEntity));
-    }
-
-    @Override
-    public TaskDetailOutputDto updateTask(TaskInputDto taskInputDto, Long taskId, Long userId) {
-        if (!taskRepository.existsById(taskId)) {
-            throw Errors.TASK_NOT_FOUND;
-        }
-        TaskEntity taskEntity = taskRepository.getById(taskId);
-        if (taskEntity.getDeadline().isBefore(OffsetDateTime.now())) {
-            throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
-        }
-        return taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskEntity));
-    }
-
-    @Override
-    public void deleteTask(Long taskId) {
-        if (!taskRepository.existsById(taskId)) {
-            throw Errors.TASK_NOT_FOUND;
-        }
-        taskRepository.deleteById(taskId);
-    }
-
-    @Override
-    public TaskDetailOutputDto getTaskDetailOutputDtoFromTaskEntity(TaskEntity taskEntity) {
+        if(!isTaskExist(taskId, userId)) throw Errors.TASK_NOT_FOUND;
+        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> Errors.TASK_NOT_FOUND);
         TaskDetailOutputDto taskDetailOutputDto = taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskEntity);
-        taskDetailOutputDto.setProject(projectService.getProjectById(taskEntity.getProjectId()));
         return taskDetailOutputDto;
     }
 
     @Override
+    public Pagination<TaskOutputDto> getTaskByUserId(Long userId, Pageable pageable, SearchTaskInputDto searchTaskInputDto) {
+        Pagination<TaskOutputDto> pagination = new Pagination<>();
+        Page<TaskEntity> taskEntities = taskRepository.searchInUser(userId, searchTaskInputDto.getKeyword() != null ? searchTaskInputDto.getKeyword() : "", pageable);
+        pagination.setItems(taskEntities.stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
+        pagination.setTotals(taskEntities.getTotalElements());
+        return pagination;
+    }
+
+    @Override
+    public TaskDetailOutputDto createTask(TaskInputDto taskInputDto, Long userId) {
+        if(!projectRepository.existsByIdAndUserId(taskInputDto.getProjectId(), userId)) throw Errors.PROJECT_NOT_FOUND;
+        if(taskInputDto.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
+        ProjectEntity projectEntity = projectRepository.findById(taskInputDto.getProjectId()).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);
+        if(taskInputDto.getDeadline().isAfter(projectEntity.getDeadline())) throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
+        return taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskMapper.getTaskEntityFromTaskInputDto(taskInputDto)));
+    }
+
+    @Override
+    public TaskDetailOutputDto updateTask(TaskInputDto taskInputDto, Long taskId, Long userId) {
+        if(!isTaskExist(taskId, userId)) throw Errors.TASK_NOT_FOUND;
+        if(!projectRepository.existsByIdAndUserId(taskInputDto.getProjectId(), userId)) throw Errors.PROJECT_NOT_FOUND;
+        if(taskInputDto.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
+        ProjectEntity projectEntity = projectRepository.findById(taskInputDto.getProjectId()).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);
+        if(taskInputDto.getDeadline().isAfter(projectEntity.getDeadline())) throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
+        return taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskMapper.getTaskEntityFromTaskInputDto(taskInputDto)));
+    }
+
+    @Override
+    public void deleteTask(Long taskId, Long userId) {
+
+    }
+
+    @Override
+    public TaskDetailOutputDto getTaskDetailOutputDtoFromTaskEntity(TaskEntity taskEntity) {
+        return null;
+    }
+
+    @Override
     public boolean isTaskExist(Long taskId, Long userId) {
-//        TODO: hard
-        return true;
+        return taskRepository.existsByIdAndUserId(taskId, userId);
     }
 
     @Override
     public boolean isTaskExist(Long taskId) {
-        return taskRepository.existsById(taskId);
+        return false;
+    }
+
+    @Override
+    public Pagination<TaskOutputDto> getTaskByProjectId(Long userId, Pageable pageable, SearchTaskInputDto search, Long projectId) {
+        Pagination<TaskOutputDto> pagination = new Pagination<>();
+        Page<TaskEntity> taskEntities = taskRepository.searchInProject(projectId, search.getKeyword() != null ? search.getKeyword() : "", userId, pageable);
+        pagination.setItems(taskEntities.stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
+        pagination.setTotals(taskEntities.getTotalElements());
+        return pagination;
     }
 }

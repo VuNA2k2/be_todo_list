@@ -1,5 +1,6 @@
 package com.backend.todolist.dto.accountdto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data

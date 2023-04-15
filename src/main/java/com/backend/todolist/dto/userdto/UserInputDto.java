@@ -1,5 +1,7 @@
 package com.backend.todolist.dto.userdto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,11 +14,17 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserInputDto {
+    @NotNull
+    @NotEmpty
     private String username;
+    @NotNull
+    @NotEmpty
     private String fullName;
 
     private Date dateOfBirth;
     private String phoneNumber;
+    @NotNull
+    @NotEmpty
     private String email;
     private String avatar;
 }

@@ -7,6 +7,7 @@ import com.backend.todolist.entity.UserDetailEntity;
 import com.backend.todolist.response.Pagination;
 import com.backend.todolist.response.Response;
 import com.backend.todolist.service.project.ProjectService;
+import jakarta.validation.Valid;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,13 +35,13 @@ public class ProjectController {
         return Response.success(ProjectOutputDto);
     }
     @PostMapping
-    Response<ProjectOutputDto> createProject(@RequestBody ProjectInputDto projectInputDto) {
+    Response<ProjectOutputDto> createProject(@RequestBody @Valid ProjectInputDto projectInputDto) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
         ProjectOutputDto ProjectOutputDto = projectService.createProject(projectInputDto, userDetailEntity.getAccount().getUserId());
         return Response.success(ProjectOutputDto);
     }
     @PutMapping
-    Response<ProjectOutputDto> updateProject(@RequestBody ProjectInputDto projectInputDto, @RequestParam Long id) {
+    Response<ProjectOutputDto> updateProject(@RequestBody @Valid ProjectInputDto projectInputDto, @RequestParam Long id) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
         ProjectOutputDto ProjectOutputDto = projectService.updateProject(projectInputDto, id, userDetailEntity.getAccount().getUserId());
         return Response.success(ProjectOutputDto);
