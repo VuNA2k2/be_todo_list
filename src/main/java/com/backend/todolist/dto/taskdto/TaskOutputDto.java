@@ -1,5 +1,6 @@
 package com.backend.todolist.dto.taskdto;
 
+import com.backend.todolist.entity.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,5 @@ public class TaskOutputDto {
     private Long numberOfPomodoro;
     private OffsetDateTime deadline;
     private Double progress;
+    private Status status;
 }

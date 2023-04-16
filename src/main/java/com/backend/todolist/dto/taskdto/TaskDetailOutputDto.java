@@ -2,6 +2,7 @@ package com.backend.todolist.dto.taskdto;
 
 import com.backend.todolist.dto.projectdto.ProjectOutputDto;
 import com.backend.todolist.entity.Priority;
+import com.backend.todolist.entity.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,6 @@ public class TaskDetailOutputDto {
     private Long numberOfPomodoro;
     private OffsetDateTime deadline;
     private Time currentDoingTime;
+    private Status status;
     private boolean reminder;
 }
