@@ -1,6 +1,4 @@
 package com.backend.todolist.entity;
-
-import com.backend.todolist.utils.attributeconverter.BitBooleanConverter;
 import com.backend.todolist.utils.attributeconverter.PriorityConverter;
 import com.backend.todolist.utils.attributeconverter.StatusConverter;
 import jakarta.persistence.*;
@@ -35,7 +33,6 @@ public class TaskEntity {
     private OffsetDateTime deadline;
     @Column(name = "current_doing_time")
     private Time currentDoingTime;
-    @Convert(converter = BitBooleanConverter.class)
     private boolean reminder;
     @Convert(converter = StatusConverter.class)
     private Status status;
