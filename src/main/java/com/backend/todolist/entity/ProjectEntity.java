@@ -1,7 +1,5 @@
 package com.backend.todolist.entity;
 
-import com.backend.todolist.utils.attributeconverter.PriorityConverter;
-import com.backend.todolist.utils.attributeconverter.StatusConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
