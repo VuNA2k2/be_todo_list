@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.sql.Time;
 import java.time.OffsetDateTime;
 @Data
 @AllArgsConstructor
@@ -28,6 +29,7 @@ public class TaskInputDto {
     @NotNull
     @Digits(integer = 10, fraction = 0)
     private Long numberOfPomodoro;
+    private Time currentDoingTime = Time.valueOf("00:00:00");
     @NotNull
     private OffsetDateTime deadline;
     private Boolean reminder;

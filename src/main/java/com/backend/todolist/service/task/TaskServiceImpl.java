@@ -1,5 +1,6 @@
 package com.backend.todolist.service.task;
 
+import com.backend.todolist.dto.projectdto.ProjectOutputDto;
 import com.backend.todolist.dto.searchdto.SearchTaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskDetailOutputDto;
 import com.backend.todolist.dto.taskdto.TaskInputDto;
@@ -9,6 +10,7 @@ import com.backend.todolist.entity.TaskEntity;
 import com.backend.todolist.repository.ProjectRepository;
 import com.backend.todolist.repository.TaskRepository;
 import com.backend.todolist.response.Pagination;
+import com.backend.todolist.service.project.ProjectMapper;
 import com.backend.todolist.utils.exception.Errors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,12 +22,14 @@ import java.util.stream.Collectors;
 @Service
 public class TaskServiceImpl implements TaskService {
     private final TaskMapper taskMapper;
+    private final ProjectMapper projectMapper;
     private final TaskRepository taskRepository;
 
     private final ProjectRepository projectRepository;
 
-    public TaskServiceImpl(TaskMapper taskMapper, TaskRepository taskRepository, ProjectRepository projectRepository) {
+    public TaskServiceImpl(TaskMapper taskMapper, ProjectMapper projectMapper, TaskRepository taskRepository, ProjectRepository projectRepository) {
         this.taskMapper = taskMapper;
+        this.projectMapper = projectMapper;
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
     }
@@ -35,8 +39,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskDetailOutputDto getTaskDetail(Long taskId, Long userId) {
         if(!isTaskExist(taskId, userId)) throw Errors.TASK_NOT_FOUND;
         TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> Errors.TASK_NOT_FOUND);
-        TaskDetailOutputDto taskDetailOutputDto = taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskEntity);
-        return taskDetailOutputDto;
+        return getTaskDetailOutputDtoFromTaskEntity(taskEntity);
     }
 
     @Override
@@ -54,7 +57,8 @@ public class TaskServiceImpl implements TaskService {
         if(taskInputDto.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
         ProjectEntity projectEntity = projectRepository.findById(taskInputDto.getProjectId()).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);
         if(taskInputDto.getDeadline().isAfter(projectEntity.getDeadline())) throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
-        return taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskMapper.getTaskEntityFromTaskInputDto(taskInputDto)));
+        TaskEntity taskEntity = taskMapper.getTaskEntityFromTaskInputDto(taskInputDto);
+        return getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskEntity));
     }
 
     @Override
@@ -64,17 +68,31 @@ public class TaskServiceImpl implements TaskService {
         if(taskInputDto.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
         ProjectEntity projectEntity = projectRepository.findById(taskInputDto.getProjectId()).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);
         if(taskInputDto.getDeadline().isAfter(projectEntity.getDeadline())) throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
-        return taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskMapper.getTaskEntityFromTaskInputDto(taskInputDto)));
+        TaskEntity taskEntity = taskMapper.getTaskEntityFromTaskInputDto(taskInputDto);
+        taskEntity.setId(taskId);
+        return getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskEntity));
     }
 
     @Override
     public void deleteTask(Long taskId, Long userId) {
-
+        if(!isTaskExist(taskId, userId)) throw Errors.TASK_NOT_FOUND;
+        taskRepository.deleteById(taskId);
     }
 
     @Override
     public TaskDetailOutputDto getTaskDetailOutputDtoFromTaskEntity(TaskEntity taskEntity) {
-        return null;
+        TaskDetailOutputDto taskDetailOutputDto = taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskEntity);
+        taskDetailOutputDto.setProject(getProjectById(taskEntity.getProjectId()));
+        return taskDetailOutputDto;
+    }
+
+    @Override
+    public TaskOutputDto getTaskOutputDtoFromTaskEntity(TaskEntity taskEntity) {
+        TaskOutputDto taskOutputDto = getTaskOutputDtoFromTaskEntity(taskEntity);
+        Long totalMinutes = taskEntity.getNumberOfPomodoro() * 25;
+        Long currentMinutes = taskEntity.getCurrentDoingTime().getTime() / 60000;
+        taskOutputDto.setProgress((double) (currentMinutes * 100 / totalMinutes));
+        return taskOutputDto;
     }
 
     @Override
@@ -84,7 +102,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public boolean isTaskExist(Long taskId) {
-        return false;
+        return taskRepository.existsById(taskId);
     }
 
     @Override
@@ -94,5 +112,10 @@ public class TaskServiceImpl implements TaskService {
         pagination.setItems(taskEntities.stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
         pagination.setTotals(taskEntities.getTotalElements());
         return pagination;
+    }
+
+    private ProjectOutputDto getProjectById(Long id) {
+        ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);
+        return projectMapper.getProjectOutputDtoFromProjectEntity(projectEntity);
     }
 }

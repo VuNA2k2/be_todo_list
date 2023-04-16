@@ -49,6 +49,12 @@ public class TaskController {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
         return Response.success(taskService.updateTask(taskInputDto, id, userDetailEntity.getAccount().getUserId()));
     }
+    @DeleteMapping()
+    Response<String> deleteTask(@RequestParam Long id) {
+        UserDetailEntity userDetailEntity = getUserDetailEntity();
+        taskService.deleteTask(id, userDetailEntity.getAccount().getUserId());
+        return Response.success();
+    }
     private UserDetailEntity getUserDetailEntity() {
         return (UserDetailEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }

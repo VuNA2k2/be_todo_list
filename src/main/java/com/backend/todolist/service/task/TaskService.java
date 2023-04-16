@@ -18,6 +18,7 @@ public interface TaskService {
     TaskDetailOutputDto updateTask(TaskInputDto taskInputDto, Long taskId, Long userId);
     void deleteTask(Long taskId, Long userId);
     TaskDetailOutputDto getTaskDetailOutputDtoFromTaskEntity(TaskEntity taskEntity);
+    TaskOutputDto getTaskOutputDtoFromTaskEntity(TaskEntity taskEntity);
     boolean isTaskExist(Long taskId, Long userId);
 
     boolean isTaskExist(Long taskId);

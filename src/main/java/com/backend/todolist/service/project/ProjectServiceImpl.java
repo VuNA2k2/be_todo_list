@@ -31,7 +31,7 @@ public class ProjectServiceImpl implements ProjectService {
     public Pagination<ProjectOutputDto> getAllByUserId(Long userId, Pageable pageable, SearchInputDto search) {
         Pagination<ProjectOutputDto> pageOutputDto = new Pagination<>();
         Page<ProjectEntity> projectEntities = projectRepository.findAllByUserIdAndNameContainingIgnoreCase(userId, search != null ? search.getKeyword() != null ? search.getKeyword() : "" : "", pageable);
-        pageOutputDto.setItems(projectEntities.stream().map(projectMapper::getProjectOutputDtoFromProjectEntity).collect(Collectors.toList()));
+        pageOutputDto.setItems(projectEntities.stream().map(this::getProjectOutputDtoFromProjectEntity).collect(Collectors.toList()));
         pageOutputDto.setTotals(projectEntities.getTotalElements());
         return pageOutputDto;
     }
