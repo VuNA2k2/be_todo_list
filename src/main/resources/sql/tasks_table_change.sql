@@ -17,3 +17,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
 ALTER TABLE public.tasks ALTER COLUMN deadline TYPE timestamptz;
 
 ALTER TABLE public.tasks ALTER COLUMN current_doing_time TYPE time;
+
+ALTER TABLE public.tasks ALTER COLUMN status SET DEFAULT 'TODO';
+
+ALTER TABLE public.tasks ALTER COLUMN priority SET DEFAULT 'LOW';

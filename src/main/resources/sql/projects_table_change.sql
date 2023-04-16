@@ -15,3 +15,7 @@ ALTER TABLE public.projects ALTER COLUMN user_id SET NOT NULL;
 ALTER TABLE public.projects ALTER COLUMN priority TYPE varchar;
 
 ALTER TABLE public.projects ALTER COLUMN deadline TYPE timestamptz;
+
+ALTER TABLE public.projects ALTER COLUMN status SET DEFAULT 'TODO';
+
+ALTER TABLE public.projects ALTER COLUMN priority SET DEFAULT 'LOW';
