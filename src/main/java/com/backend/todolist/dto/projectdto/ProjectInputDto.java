@@ -20,8 +20,8 @@ public class ProjectInputDto {
     @NotEmpty
     private String name;
     private String description;
-    private Priority priority;
+    private Priority priority = Priority.LOW;
     @NotNull
     private OffsetDateTime deadline;
-    private Status status;
+    private Status status = Status.TODO;
 }
