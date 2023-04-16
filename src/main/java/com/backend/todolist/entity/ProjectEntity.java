@@ -26,8 +26,8 @@ public class ProjectEntity {
     private Long userId;
 
     private OffsetDateTime deadline;
-    @Convert(converter = PriorityConverter.class)
+    @Enumerated(EnumType.STRING)
     private Priority priority;
-    @Convert(converter = StatusConverter.class)
+    @Enumerated(EnumType.STRING)
     private Status status;
 }

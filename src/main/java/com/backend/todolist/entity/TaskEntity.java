@@ -26,7 +26,7 @@ public class TaskEntity {
     private String title;
     private String subtitle;
     private String description;
-    @Convert(converter = PriorityConverter.class)
+    @Enumerated(EnumType.STRING)
     private Priority priority;
     @Column(name = "number_of_pomodoro")
     private Long numberOfPomodoro;
@@ -34,6 +34,6 @@ public class TaskEntity {
     @Column(name = "current_doing_time")
     private Time currentDoingTime;
     private boolean reminder;
-    @Convert(converter = StatusConverter.class)
+    @Enumerated(EnumType.STRING)
     private Status status;
 }
