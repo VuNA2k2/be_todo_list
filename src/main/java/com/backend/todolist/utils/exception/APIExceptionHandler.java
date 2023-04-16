@@ -8,13 +8,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.net.BindException;
+
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestControllerAdvice
 public class APIExceptionHandler {
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    @ResponseStatus(OK)
     public Response<ErrorEntity> handleAllException(Exception e) {
         return new Response<>(new ErrorEntity("500", e.getMessage()));
     }
@@ -27,6 +29,12 @@ public class APIExceptionHandler {
     @ResponseStatus(OK)
     public Response<ErrorEntity> handleRestException(RestException e) {
         return new Response<>(new ErrorEntity(e.getCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(BindException.class)
+    @ResponseStatus(OK)
+    public Response<ErrorEntity> handleBindException(BindException e) {
+        return new Response<>(new ErrorEntity("400", e.getMessage()));
     }
 
     // TODO: Add more exception handler here
