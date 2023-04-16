@@ -11,10 +11,10 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class LoginInputDto {
-//    @NotNull
-//    @NotEmpty
+    @NotNull
+    @NotEmpty
     private String username;
-//    @NotNull
-//    @NotEmpty
+    @NotNull
+    @NotEmpty
     private String password;
 }
