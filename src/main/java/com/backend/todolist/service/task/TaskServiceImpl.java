@@ -6,6 +6,7 @@ import com.backend.todolist.dto.taskdto.TaskDetailOutputDto;
 import com.backend.todolist.dto.taskdto.TaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskOutputDto;
 import com.backend.todolist.entity.ProjectEntity;
+import com.backend.todolist.entity.Status;
 import com.backend.todolist.entity.TaskEntity;
 import com.backend.todolist.repository.ProjectRepository;
 import com.backend.todolist.repository.TaskRepository;
@@ -53,23 +54,16 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDetailOutputDto createTask(TaskInputDto taskInputDto, Long userId) {
-        if(!projectRepository.existsByIdAndUserId(taskInputDto.getProjectId(), userId)) throw Errors.PROJECT_NOT_FOUND;
-        if(taskInputDto.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
-        ProjectEntity projectEntity = projectRepository.findById(taskInputDto.getProjectId()).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);
-        if(taskInputDto.getDeadline().isAfter(projectEntity.getDeadline())) throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
         TaskEntity taskEntity = taskMapper.getTaskEntityFromTaskInputDto(taskInputDto);
+        validate(taskEntity, userId);
         return getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskEntity));
     }
 
     @Override
     public TaskDetailOutputDto updateTask(TaskInputDto taskInputDto, Long taskId, Long userId) {
-        if(!isTaskExist(taskId, userId)) throw Errors.TASK_NOT_FOUND;
-        if(!projectRepository.existsByIdAndUserId(taskInputDto.getProjectId(), userId)) throw Errors.PROJECT_NOT_FOUND;
-        if(taskInputDto.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
-        ProjectEntity projectEntity = projectRepository.findById(taskInputDto.getProjectId()).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);
-        if(taskInputDto.getDeadline().isAfter(projectEntity.getDeadline())) throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
         TaskEntity taskEntity = taskMapper.getTaskEntityFromTaskInputDto(taskInputDto);
         taskEntity.setId(taskId);
+        validate(taskEntity, userId);
         return getTaskDetailOutputDtoFromTaskEntity(taskRepository.save(taskEntity));
     }
 
@@ -86,13 +80,28 @@ public class TaskServiceImpl implements TaskService {
         return taskDetailOutputDto;
     }
 
+    @SuppressWarnings("InfiniteRecursion")
     @Override
     public TaskOutputDto getTaskOutputDtoFromTaskEntity(TaskEntity taskEntity) {
         TaskOutputDto taskOutputDto = getTaskOutputDtoFromTaskEntity(taskEntity);
-        Long totalMinutes = taskEntity.getNumberOfPomodoro() * 25;
-        Long currentMinutes = taskEntity.getCurrentDoingTime().getTime() / 60000;
+        long totalMinutes = taskEntity.getNumberOfPomodoro() * 25;
+        long currentMinutes = taskEntity.getCurrentDoingTime().getTime() / 60000;
         taskOutputDto.setProgress((double) (currentMinutes * 100 / totalMinutes));
         return taskOutputDto;
+    }
+
+    private void validate(TaskEntity taskEntity, Long userId) {
+        if(taskEntity.getId() != null && !taskRepository.existsById(taskEntity.getId())) throw Errors.TASK_NOT_FOUND;
+        if(taskEntity.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
+        if(!projectRepository.existsByIdAndUserId(taskEntity.getProjectId(), userId)) throw Errors.PROJECT_NOT_FOUND;
+        ProjectEntity projectEntity = projectRepository.findById(taskEntity.getProjectId()).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);
+        if(taskEntity.getDeadline().isAfter(projectEntity.getDeadline())) throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
+        if(projectEntity.getStatus() == Status.DONE) {
+            throw Errors.PROJECT_STATUS_IS_DONE;
+        }
+        else if(projectEntity.getStatus() == Status.TODO && taskEntity.getStatus() != Status.TODO) {
+            throw Errors.PROJECT_STATUS_IS_TODO;
+        }
     }
 
     @Override

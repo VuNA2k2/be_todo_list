@@ -1,5 +1,6 @@
 package com.backend.todolist.repository;
 
+import com.backend.todolist.entity.Status;
 import com.backend.todolist.entity.TaskEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,9 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
     Optional<TaskEntity> findById(Long taskId);
 
     void deleteById(Long taskId);
-
+    void deleteByProjectId(Long projectId);
+    Long countAllByProjectIdAndStatus(Long projectId, Status status);
+    Long countAllByProjectId(Long projectId);
     TaskEntity save(TaskEntity taskEntity);
 
     boolean existsById(Long taskId);
