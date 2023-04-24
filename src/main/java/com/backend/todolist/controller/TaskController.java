@@ -9,13 +9,9 @@ import com.backend.todolist.response.Pagination;
 import com.backend.todolist.response.Response;
 import com.backend.todolist.service.task.TaskService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tasks")
@@ -32,7 +28,7 @@ public class TaskController {
     @GetMapping("/search")
     Response<Pagination<TaskOutputDto>> searchTaskByUser(Pageable pageable, SearchTaskInputDto search) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
-        return Response.success(taskService.getTaskByUserId(userDetailEntity.getAccount().getUserId(), pageable, search));
+        return Response.success(taskService.getTasksByUserId(userDetailEntity.getAccount().getUserId(), pageable, search));
     }
     @GetMapping("/search/{projectId}")
     Response<Pagination<TaskOutputDto>> searchTaskByProject(Pageable pageable, SearchTaskInputDto search, @PathVariable Long projectId) {

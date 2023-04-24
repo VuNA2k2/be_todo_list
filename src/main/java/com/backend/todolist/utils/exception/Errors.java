@@ -17,4 +17,5 @@ public interface Errors {
     RestException UNAUTHORIZED = new RestException("12", "UNAUTHORIZED");
     RestException PROJECT_STATUS_IS_TODO = new RestException("13", "PROJECT_STATUS_IS_TODO");
     RestException PROJECT_STATUS_IS_DONE = new RestException("14", "PROJECT_STATUS_IS_DONE");
+    RestException NOTE_NOT_FOUND = new RestException("15", "NOTE_NOT_FOUND");
 }

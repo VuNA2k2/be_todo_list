@@ -24,7 +24,7 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
 
     boolean existsById(Long taskId);
 
-    @Query("SELECT COUNT(*) > 0 FROM TaskEntity t JOIN UserEntity u WHERE t.id = :taskId AND u.userId = :userId")
+    @Query("SELECT COUNT(*) > 0 FROM TaskEntity t JOIN ProjectEntity p ON t.projectId = p.id JOIN UserEntity u ON p.userId = u.userId WHERE t.id = :taskId AND u.userId = :userId")
     boolean existsByIdAndUserId(Long taskId, Long userId);
 
     boolean existsByIdAndProjectId(Long taskId, Long projectId);

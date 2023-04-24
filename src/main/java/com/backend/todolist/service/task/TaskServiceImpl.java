@@ -44,7 +44,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Pagination<TaskOutputDto> getTaskByUserId(Long userId, Pageable pageable, SearchTaskInputDto searchTaskInputDto) {
+    public Pagination<TaskOutputDto> getTasksByUserId(Long userId, Pageable pageable, SearchTaskInputDto searchTaskInputDto) {
         Pagination<TaskOutputDto> pagination = new Pagination<>();
         Page<TaskEntity> taskEntities = taskRepository.searchInUser(userId, searchTaskInputDto.getKeyword() != null ? searchTaskInputDto.getKeyword() : "", pageable);
         pagination.setItems(taskEntities.stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
@@ -91,7 +91,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void validate(TaskEntity taskEntity, Long userId) {
-        if(taskEntity.getId() != null && !taskRepository.existsById(taskEntity.getId())) throw Errors.TASK_NOT_FOUND;
+        if(taskEntity.getId() != null && !isTaskExist(taskEntity.getId(), userId)) throw Errors.TASK_NOT_FOUND;
         if(taskEntity.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
         if(!projectRepository.existsByIdAndUserId(taskEntity.getProjectId(), userId)) throw Errors.PROJECT_NOT_FOUND;
         ProjectEntity projectEntity = projectRepository.findById(taskEntity.getProjectId()).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);

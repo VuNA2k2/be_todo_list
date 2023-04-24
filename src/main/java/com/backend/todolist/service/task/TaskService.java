@@ -6,14 +6,11 @@ import com.backend.todolist.dto.taskdto.TaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskOutputDto;
 import com.backend.todolist.entity.TaskEntity;
 import com.backend.todolist.response.Pagination;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface TaskService {
     TaskDetailOutputDto getTaskDetail(Long taskId, Long userId);
-    Pagination<TaskOutputDto> getTaskByUserId(Long userId, Pageable pageable, SearchTaskInputDto searchTaskInputDto);
+    Pagination<TaskOutputDto> getTasksByUserId(Long userId, Pageable pageable, SearchTaskInputDto searchTaskInputDto);
     TaskDetailOutputDto createTask(TaskInputDto taskInputDto, Long userId);
     TaskDetailOutputDto updateTask(TaskInputDto taskInputDto, Long taskId, Long userId);
     void deleteTask(Long taskId, Long userId);
