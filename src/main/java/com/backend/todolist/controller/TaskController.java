@@ -26,12 +26,12 @@ public class TaskController {
         return Response.success(taskService.getTaskDetail(id, userDetailEntity.getAccount().getUserId()));
     }
     @GetMapping("/search")
-    Response<Pagination<TaskOutputDto>> searchTaskByUser(Pageable pageable, SearchTaskInputDto search) {
+    Response<Pagination<TaskOutputDto>> searchTaskByUser(Pageable pageable,@ModelAttribute SearchTaskInputDto search) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
         return Response.success(taskService.getTasksByUserId(userDetailEntity.getAccount().getUserId(), pageable, search));
     }
     @GetMapping("/search/{projectId}")
-    Response<Pagination<TaskOutputDto>> searchTaskByProject(Pageable pageable, SearchTaskInputDto search, @PathVariable Long projectId) {
+    Response<Pagination<TaskOutputDto>> searchTaskByProject(Pageable pageable,@ModelAttribute SearchTaskInputDto search, @PathVariable Long projectId) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
         return Response.success(taskService.getTaskByProjectId(userDetailEntity.getAccount().getUserId(), pageable, search, projectId));
     }

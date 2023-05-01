@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 
@@ -31,11 +33,11 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
 
     @Query(value = "SELECT t FROM TaskEntity t JOIN ProjectEntity p " +
             "ON p.id = :projectId AND t.projectId = p.id WHERE p.userId = :userId " +
-            "AND UPPER(t.title) LIKE UPPER(CONCAT('%', :title, '%'))")
-    Page<TaskEntity> searchInProject(Long projectId, String title, Long userId, Pageable pageable);
+            "AND UPPER(t.title) LIKE UPPER(CONCAT('%', :title, '%'))"+
+            "AND (FUNCTION('DATE', t.deadline) = COALESCE(:deadline, FUNCTION('DATE', t.deadline)))")
+    Page<TaskEntity> searchInProject(Long projectId, String title, Long userId, LocalDate deadline, Pageable pageable);
 
-    @Query(value = "SELECT t FROM TaskEntity t JOIN ProjectEntity p "+
-            "ON t.projectId = p.id WHERE p.userId = :userId "+
-            "AND UPPER(t.title) LIKE UPPER(CONCAT('%', :title, '%'))")
-    Page<TaskEntity> searchInUser(@Param("userId") Long userId, @Param("title") String title, Pageable pageable);
+    @Query(value = "SELECT t FROM TaskEntity t JOIN ProjectEntity p ON p.id = t.projectId AND t.projectId = p.id  WHERE p.userId = :userId AND UPPER(t.title) LIKE UPPER(CONCAT('%', :title, '%')) AND (FUNCTION('DATE', t.deadline) = COALESCE(:deadline, FUNCTION('DATE', t.deadline)))")
+    Page<TaskEntity> searchInUser(Long userId, String title, LocalDate deadline, Pageable pageable);
+
 }

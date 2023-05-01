@@ -8,9 +8,6 @@ import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Accessors(chain = true)
 public class SearchNoteInputDto extends SearchInputDto {
-    private Long projectId;
-    private Status status;
 }

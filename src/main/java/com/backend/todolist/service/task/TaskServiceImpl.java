@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +39,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDetailOutputDto getTaskDetail(Long taskId, Long userId) {
-        if(!isTaskExist(taskId, userId)) throw Errors.TASK_NOT_FOUND;
+        if (!isTaskExist(taskId, userId)) throw Errors.TASK_NOT_FOUND;
         TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> Errors.TASK_NOT_FOUND);
         return getTaskDetailOutputDtoFromTaskEntity(taskEntity);
     }
@@ -46,7 +47,14 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Pagination<TaskOutputDto> getTasksByUserId(Long userId, Pageable pageable, SearchTaskInputDto searchTaskInputDto) {
         Pagination<TaskOutputDto> pagination = new Pagination<>();
-        Page<TaskEntity> taskEntities = taskRepository.searchInUser(userId, searchTaskInputDto.getKeyword() != null ? searchTaskInputDto.getKeyword() : "", pageable);
+        Page<TaskEntity> taskEntities = taskRepository.searchInUser(userId,
+                searchTaskInputDto.getKeyword() != null ?
+                        searchTaskInputDto.getKeyword() :
+                        "",
+                searchTaskInputDto.getDeadline() != null ?
+                        searchTaskInputDto.getDeadline().withOffsetSameInstant(ZoneOffset.UTC).toLocalDate() :
+                        null,
+                pageable);
         pagination.setItems(taskEntities.stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
         pagination.setTotals(taskEntities.getTotalElements());
         return pagination;
@@ -69,7 +77,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteTask(Long taskId, Long userId) {
-        if(!isTaskExist(taskId, userId)) throw Errors.TASK_NOT_FOUND;
+        if (!isTaskExist(taskId, userId)) throw Errors.TASK_NOT_FOUND;
         taskRepository.deleteById(taskId);
     }
 
@@ -91,15 +99,15 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void validate(TaskEntity taskEntity, Long userId) {
-        if(taskEntity.getId() != null && !isTaskExist(taskEntity.getId(), userId)) throw Errors.TASK_NOT_FOUND;
-        if(taskEntity.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
-        if(!projectRepository.existsByIdAndUserId(taskEntity.getProjectId(), userId)) throw Errors.PROJECT_NOT_FOUND;
+        if (taskEntity.getId() != null && !isTaskExist(taskEntity.getId(), userId)) throw Errors.TASK_NOT_FOUND;
+        if (taskEntity.getDeadline().isBefore(OffsetDateTime.now())) throw Errors.TASK_DEADLINE_IS_BEFORE_NOW;
+        if (!projectRepository.existsByIdAndUserId(taskEntity.getProjectId(), userId)) throw Errors.PROJECT_NOT_FOUND;
         ProjectEntity projectEntity = projectRepository.findById(taskEntity.getProjectId()).orElseThrow(() -> Errors.PROJECT_NOT_FOUND);
-        if(taskEntity.getDeadline().isAfter(projectEntity.getDeadline())) throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
-        if(projectEntity.getStatus() == Status.DONE) {
+        if (taskEntity.getDeadline().isAfter(projectEntity.getDeadline()))
+            throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
+        if (projectEntity.getStatus() == Status.DONE) {
             throw Errors.PROJECT_STATUS_IS_DONE;
-        }
-        else if(projectEntity.getStatus() == Status.TODO && taskEntity.getStatus() != Status.TODO) {
+        } else if (projectEntity.getStatus() == Status.TODO && taskEntity.getStatus() != Status.TODO) {
             throw Errors.PROJECT_STATUS_IS_TODO;
         }
     }
@@ -117,7 +125,15 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Pagination<TaskOutputDto> getTaskByProjectId(Long userId, Pageable pageable, SearchTaskInputDto search, Long projectId) {
         Pagination<TaskOutputDto> pagination = new Pagination<>();
-        Page<TaskEntity> taskEntities = taskRepository.searchInProject(projectId, search.getKeyword() != null ? search.getKeyword() : "", userId, pageable);
+        Page<TaskEntity> taskEntities = taskRepository.searchInProject(projectId,
+                search.getKeyword() != null ?
+                        search.getKeyword() :
+                        "",
+                userId,
+                search.getDeadline() != null ?
+                        search.getDeadline().withOffsetSameInstant(ZoneOffset.UTC).toLocalDate() :
+                        null,
+                pageable);
         pagination.setItems(taskEntities.stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
         pagination.setTotals(taskEntities.getTotalElements());
         return pagination;

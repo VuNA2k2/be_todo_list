@@ -8,6 +8,7 @@ import com.backend.todolist.entity.UserDetailEntity;
 import com.backend.todolist.response.Pagination;
 import com.backend.todolist.response.Response;
 import com.backend.todolist.service.note.NoteService;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,11 @@ public class NoteController {
         return Response.success(noteService.getNoteDetail(id, userDetailEntity.getAccount().getUserId()));
     }
     @GetMapping("/search")
-    Response<Pagination<NoteOutputDto>> searchNoteByUser(Pageable pageable, SearchNoteInputDto search) {
+    Response<Pagination<NoteOutputDto>> searchNoteByUser(Pageable pageable,@ModelAttribute SearchNoteInputDto search) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
-        return Response.success(noteService.getNotesByUserId(userDetailEntity.getAccount().getUserId(), pageable, search));
+        Pagination<NoteOutputDto> noteOutputDtoPagination = noteService.getNotesByUserId(userDetailEntity.getAccount().getUserId(), pageable, search);
+        Response response = Response.success(noteOutputDtoPagination);
+        return response;
     }
     @GetMapping("/search/{projectId}")
     Response<Pagination<NoteOutputDto>> searchNoteByProject(Pageable pageable, SearchNoteInputDto search, @PathVariable Long projectId) {
