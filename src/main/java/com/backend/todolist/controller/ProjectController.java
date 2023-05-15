@@ -3,6 +3,7 @@ package com.backend.todolist.controller;
 import com.backend.todolist.dto.projectdto.ProjectInputDto;
 import com.backend.todolist.dto.projectdto.ProjectOutputDto;
 import com.backend.todolist.dto.searchdto.SearchInputDto;
+import com.backend.todolist.dto.searchdto.SearchProjectInputDto;
 import com.backend.todolist.entity.UserDetailEntity;
 import com.backend.todolist.response.Pagination;
 import com.backend.todolist.response.Response;
@@ -24,9 +25,9 @@ public class ProjectController {
         this.projectService = projectService;
     }
     @GetMapping("/search")
-    Response<Pagination<ProjectOutputDto>> getAllProjects(Pageable pageable,SearchInputDto search) {
+    Response<Pagination<ProjectOutputDto>> getAllProjects(Pageable pageable, SearchProjectInputDto searchProject) {
         UserDetailEntity userDetailEntity = getUserDetailEntity();
-        return Response.success(projectService.getAllByUserId(userDetailEntity.getAccount().getUserId(), pageable, search));
+        return Response.success(projectService.getAllByUserId(userDetailEntity.getAccount().getUserId(), pageable, searchProject));
     }
     @GetMapping
     Response<ProjectOutputDto> getProjectById(@RequestParam Long id) {

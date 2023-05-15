@@ -2,7 +2,7 @@ package com.backend.todolist.service.project;
 
 import com.backend.todolist.dto.projectdto.ProjectInputDto;
 import com.backend.todolist.dto.projectdto.ProjectOutputDto;
-import com.backend.todolist.dto.searchdto.SearchInputDto;
+import com.backend.todolist.dto.searchdto.SearchProjectInputDto;
 import com.backend.todolist.entity.ProjectEntity;
 import com.backend.todolist.entity.Status;
 import com.backend.todolist.repository.ProjectRepository;
@@ -31,9 +31,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Pagination<ProjectOutputDto> getAllByUserId(Long userId, Pageable pageable, SearchInputDto search) {
+    public Pagination<ProjectOutputDto> getAllByUserId(Long userId, Pageable pageable, SearchProjectInputDto searchProject) {
         Pagination<ProjectOutputDto> pageOutputDto = new Pagination<>();
-        Page<ProjectEntity> projectEntities = projectRepository.findAllByUserIdAndNameContainingIgnoreCase(userId, search != null ? search.getKeyword() != null ? search.getKeyword() : "" : "", pageable);
+        Page<ProjectEntity> projectEntities = projectRepository.searchInUser(userId,
+                searchProject != null ? searchProject.getKeyword() != null ? searchProject.getKeyword() : "" : "",
+                searchProject != null ? searchProject.getStatus() : null, pageable);
         pageOutputDto.setItems(projectEntities.stream().map(this::getProjectOutputDtoFromProjectEntity).collect(Collectors.toList()));
         pageOutputDto.setTotals(projectEntities.getTotalElements());
         return pageOutputDto;
@@ -86,8 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectOutputDto projectOutputDto = projectMapper.getProjectOutputDtoFromProjectEntity(projectEntity);
         projectOutputDto.setCountAllTask(taskRepository.countAllByProjectId(projectEntity.getId()));
         projectOutputDto.setCountDoneTask(taskRepository.countAllByProjectIdAndStatus(projectEntity.getId(), Status.DONE));
-        projectOutputDto.setProgress((double) (projectOutputDto.getCountAllTask() == 0 ?
-                0 : (projectOutputDto.getCountDoneTask() * 100) / projectOutputDto.getCountAllTask()));
+        projectOutputDto.setProgress((double) (projectOutputDto.getCountAllTask() == 0 ? 0 : (projectOutputDto.getCountDoneTask() * 100) / projectOutputDto.getCountAllTask()));
         return projectOutputDto;
     }
 

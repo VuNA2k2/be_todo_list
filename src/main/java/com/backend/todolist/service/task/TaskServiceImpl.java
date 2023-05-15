@@ -136,9 +136,7 @@ public class TaskServiceImpl implements TaskService {
                 search.getDeadline() != null ?
                         search.getDeadline().withOffsetSameInstant(ZoneOffset.UTC).toLocalDate() :
                         null,
-                search.getStatus() != null ?
-                        search.getStatus() :
-                        null,
+                search.getStatus(),
                 pageable);
         pagination.setItems(taskEntities.stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
         pagination.setTotals(taskEntities.getTotalElements());

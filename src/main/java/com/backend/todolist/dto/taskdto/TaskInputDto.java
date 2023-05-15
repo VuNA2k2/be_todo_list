@@ -25,7 +25,7 @@ public class TaskInputDto {
     private String title;
     private String subtitle;
     private String description;
-    private Priority priority = Priority.LOW;
+    private Priority priority;
     @NotNull
     @Digits(integer = 10, fraction = 0)
     private Long numberOfPomodoro;
@@ -33,5 +33,5 @@ public class TaskInputDto {
     @NotNull
     private OffsetDateTime deadline;
     private Boolean reminder;
-    private Status status = Status.TODO;
+    private Status status;
 }

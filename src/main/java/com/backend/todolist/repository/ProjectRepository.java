@@ -1,9 +1,11 @@
 package com.backend.todolist.repository;
 
 import com.backend.todolist.entity.ProjectEntity;
+import com.backend.todolist.entity.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -12,7 +14,11 @@ import java.util.Optional;
 @Repository
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     Optional<ProjectEntity> findById(Long id);
-    Page<ProjectEntity> findAllByUserIdAndNameContainingIgnoreCase(Long userId, String name, Pageable pageable);
+    @Query(value = "SELECT p FROM ProjectEntity p WHERE " +
+            "p.userId = :userId " +
+            "AND UPPER(p.name) LIKE UPPER(CONCAT('%', :name, '%'))" +
+            "AND (:status IS NULL OR p.status = :status)")
+    Page<ProjectEntity> searchInUser(Long userId, String name, Status status, Pageable pageable);
     void deleteById(Long id);
     ProjectEntity save(ProjectEntity projectEntity);
 

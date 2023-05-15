@@ -41,14 +41,14 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
             "ON p.id = :projectId AND t.projectId = p.id WHERE p.userId = :userId " +
             "AND UPPER(t.title) LIKE UPPER(CONCAT('%', :title, '%'))"+
             "AND (FUNCTION('DATE', t.deadline) = COALESCE(:deadline, FUNCTION('DATE', t.deadline)))" +
-            "AND :status IS NULL OR t.status = :status")
+            "AND (:status IS NULL OR t.status = :status)")
     Page<TaskEntity> searchInProject(Long projectId, String title, Long userId, LocalDate deadline, Status status, Pageable pageable);
 
     @Query(value = "SELECT t FROM TaskEntity t JOIN ProjectEntity p " +
             "ON p.id = t.projectId AND t.projectId = p.id  WHERE " +
             "p.userId = :userId AND UPPER(t.title) LIKE UPPER(CONCAT('%', :title, '%')) " +
             "AND (FUNCTION('DATE', t.deadline) = COALESCE(:deadline, FUNCTION('DATE', t.deadline)))" +
-            "AND :status IS NULL OR t.status = :status")
+            "AND (:status IS NULL OR t.status = :status)")
     Page<TaskEntity> searchInUser(Long userId, String title, LocalDate deadline, Status status, Pageable pageable);
 
 }
