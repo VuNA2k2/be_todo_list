@@ -55,7 +55,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (projectEntity.getDeadline().isBefore(OffsetDateTime.now())) {
             throw Errors.PROJECT_DEADLINE_IS_BEFORE_NOW;
         }
-        return projectMapper.getProjectOutputDtoFromProjectEntity(projectRepository.save(projectEntity));
+        return getProjectOutputDtoFromProjectEntity(projectRepository.save(projectEntity));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         projectEntity.setUserId(userId);
         projectEntity.setId(projectId);
-        return projectMapper.getProjectOutputDtoFromProjectEntity(projectRepository.save(projectEntity));
+        return getProjectOutputDtoFromProjectEntity(projectRepository.save(projectEntity));
     }
 
     @Override
@@ -84,9 +84,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectOutputDto getProjectOutputDtoFromProjectEntity(ProjectEntity projectEntity) {
         ProjectOutputDto projectOutputDto = projectMapper.getProjectOutputDtoFromProjectEntity(projectEntity);
-        Long countAllTaskByProject = taskRepository.countAllByProjectId(projectEntity.getId());
-        Long countCompletedTaskByProject = taskRepository.countAllByProjectIdAndStatus(projectEntity.getId(), Status.DONE);
-        projectOutputDto.setProgress((double) (countAllTaskByProject == 0 ? 0 : (countCompletedTaskByProject * 100) / countAllTaskByProject));
+        projectOutputDto.setCountAllTask(taskRepository.countAllByProjectId(projectEntity.getId()));
+        projectOutputDto.setCountDoneTask(taskRepository.countAllByProjectIdAndStatus(projectEntity.getId(), Status.DONE));
+        projectOutputDto.setProgress((double) (projectOutputDto.getCountAllTask() == 0 ?
+                0 : (projectOutputDto.getCountDoneTask() * 100) / projectOutputDto.getCountAllTask()));
         return projectOutputDto;
     }
 

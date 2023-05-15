@@ -21,4 +21,6 @@ public class ProjectOutputDto {
     private OffsetDateTime deadline;
     private Status status;
     private Double progress;
+    private Long countAllTask = 0L;
+    private Long countDoneTask = 0L;
 }
