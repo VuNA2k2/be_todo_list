@@ -25,3 +25,5 @@ ALTER TABLE public.tasks ALTER COLUMN priority SET DEFAULT 'LOW';
 ALTER TABLE public.tasks DROP COLUMN IF EXISTS "reminder";
 
 ALTER TABLE public.tasks ADD COLUMN "reminder" boolean NOT NULL DEFAULT false;
+
+ALTER TABLE public.tasks ALTER COLUMN current_doing_time SET DEFAULT '00:00:00';
