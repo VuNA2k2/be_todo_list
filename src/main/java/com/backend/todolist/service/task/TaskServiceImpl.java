@@ -110,7 +110,7 @@ public class TaskServiceImpl implements TaskService {
             throw Errors.PROJECT_DEADLINE_IS_BEFORE_TASK_DEADLINE;
         if (projectEntity.getStatus() == Status.DONE) {
             throw Errors.PROJECT_STATUS_IS_DONE;
-        } else if (projectEntity.getStatus() == Status.TODO && taskEntity.getStatus() != Status.TODO) {
+        } else if (projectEntity.getStatus() == Status.TODO && taskEntity.getStatus() != Status.TODO && taskEntity.getStatus() != null) {
             throw Errors.PROJECT_STATUS_IS_TODO;
         }
     }
