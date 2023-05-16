@@ -88,15 +88,21 @@ public class TaskServiceImpl implements TaskService {
     public TaskDetailOutputDto getTaskDetailOutputDtoFromTaskEntity(TaskEntity taskEntity) {
         TaskDetailOutputDto taskDetailOutputDto = taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskEntity);
         taskDetailOutputDto.setProject(getProjectById(taskEntity.getProjectId()));
+        if(taskEntity.getCurrentDoingTime() == null) return taskDetailOutputDto;
+        long totalMinutes = taskEntity.getNumberOfPomodoro() * 25;
+        long currentMinutes = taskEntity.getCurrentDoingTime().getTime() / 60000;
+        if(currentMinutes > totalMinutes) currentMinutes = totalMinutes;
+        taskDetailOutputDto.setProgress((double) (currentMinutes * 100 / totalMinutes));
         return taskDetailOutputDto;
     }
 
-    @SuppressWarnings("InfiniteRecursion")
     @Override
     public TaskOutputDto getTaskOutputDtoFromTaskEntity(TaskEntity taskEntity) {
         TaskOutputDto taskOutputDto = getTaskOutputDtoFromTaskEntity(taskEntity);
         long totalMinutes = taskEntity.getNumberOfPomodoro() * 25;
+        if(taskEntity.getCurrentDoingTime() == null) return taskOutputDto;
         long currentMinutes = taskEntity.getCurrentDoingTime().getTime() / 60000;
+        if(currentMinutes > totalMinutes) currentMinutes = totalMinutes;
         taskOutputDto.setProgress((double) (currentMinutes * 100 / totalMinutes));
         return taskOutputDto;
     }

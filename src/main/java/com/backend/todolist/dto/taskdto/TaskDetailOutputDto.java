@@ -26,5 +26,6 @@ public class TaskDetailOutputDto {
     private OffsetDateTime deadline;
     private Time currentDoingTime;
     private Status status;
+    private Double progress;
     private boolean reminder;
 }
