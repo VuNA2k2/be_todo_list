@@ -22,6 +22,8 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     void deleteById(Long id);
     ProjectEntity save(ProjectEntity projectEntity);
 
+    void deleteByUserId(Long userId);
+
     @Override
     boolean existsById(Long id);
     boolean existsByIdAndUserId(Long id, Long userId);

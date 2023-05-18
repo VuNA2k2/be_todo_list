@@ -11,6 +11,7 @@ import com.backend.todolist.entity.UserDetailEntity;
 import com.backend.todolist.service.account.AccountMapper;
 import com.backend.todolist.service.account.AccountService;
 import com.backend.todolist.service.jwt.JwtService;
+import com.backend.todolist.service.security.SecurityService;
 import com.backend.todolist.service.user.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,8 +30,9 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
+    private final SecurityService securityService;
 
-    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtService tokenProvider, AuthMapper authMapper, AccountService accountService, UserService userService, AccountMapper accountMapper, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtService tokenProvider, AuthMapper authMapper, AccountService accountService, UserService userService, AccountMapper accountMapper, PasswordEncoder passwordEncoder, SecurityService securityService) {
         this.authenticationManager = authenticationManager;
         this.jwtService = tokenProvider;
         this.authMapper = authMapper;
@@ -38,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
         this.userService = userService;
         this.accountMapper = accountMapper;
         this.passwordEncoder = passwordEncoder;
+        this.securityService = securityService;
     }
 
     @Override
@@ -50,8 +53,11 @@ public class AuthServiceImpl implements AuthService {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtService.generateToken((UserDetailEntity) authentication.getPrincipal());
-        return new LoginOutputDto(jwt, jwt);
+        String refreshJwt = jwtService.generateRefreshToken((UserDetailEntity) authentication.getPrincipal());
+        return new LoginOutputDto(jwt, refreshJwt);
     }
+
+
 
     @Override
     public RegisterOutputDto register(RegisterInputDto registerInputDto) {
@@ -64,6 +70,14 @@ public class AuthServiceImpl implements AuthService {
         accountService.createAccount(accountInputDto);
         accountMapper.getEntityFromInput(accountInputDto);
         return authMapper.getRegisterOutputDtoFromUserDetailOutputDto(userDetailOutputDto);
+    }
+
+    @Override
+    public LoginOutputDto refreshToken(String refreshToken) {
+        UserDetailEntity userDetail = (UserDetailEntity) securityService.loadUserByUsername(jwtService.getUserNameFromToken(refreshToken));
+        String jwt = jwtService.generateToken(userDetail);
+        String refreshJwt = jwtService.generateRefreshToken(userDetail);
+        return new LoginOutputDto(jwt, refreshJwt);
     }
 
 

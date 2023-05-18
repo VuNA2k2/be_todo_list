@@ -2,11 +2,14 @@ package com.backend.todolist.controller;
 
 import com.backend.todolist.dto.logindto.LoginInputDto;
 import com.backend.todolist.dto.logindto.LoginOutputDto;
+import com.backend.todolist.dto.logindto.RefreshInputDto;
 import com.backend.todolist.dto.registerdto.RegisterInputDto;
 import com.backend.todolist.dto.registerdto.RegisterOutputDto;
+import com.backend.todolist.entity.UserDetailEntity;
 import com.backend.todolist.response.Response;
 import com.backend.todolist.service.auth.AuthService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -26,5 +29,10 @@ public class AuthController {
     @PostMapping("/register")
     Response<RegisterOutputDto> register(@RequestBody @Valid RegisterInputDto registerInputDto) {
         return Response.success(authService.register(registerInputDto));
+    }
+
+    @PostMapping("/refresh")
+    Response<LoginOutputDto> refreshToken(@RequestBody @Valid RefreshInputDto refreshInputDto) {
+        return Response.success(authService.refreshToken(refreshInputDto.getRefreshToken()));
     }
 }

@@ -1,6 +1,7 @@
 package com.backend.todolist.controller;
 
 import com.backend.todolist.dto.searchdto.SearchTaskInputDto;
+import com.backend.todolist.dto.taskdto.DoTaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskDetailOutputDto;
 import com.backend.todolist.dto.taskdto.TaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskOutputDto;
@@ -53,5 +54,12 @@ public class TaskController {
     }
     private UserDetailEntity getUserDetailEntity() {
         return (UserDetailEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    @PutMapping("/do")
+    Response doTask(@RequestParam Long id, @RequestBody DoTaskInputDto doTaskInputDto) {
+        UserDetailEntity userDetailEntity = getUserDetailEntity();
+        taskService.doTask(id, userDetailEntity.getAccount().getUserId(), doTaskInputDto);
+        return Response.success();
     }
 }

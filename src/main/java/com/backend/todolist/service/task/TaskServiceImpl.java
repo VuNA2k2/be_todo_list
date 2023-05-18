@@ -2,6 +2,7 @@ package com.backend.todolist.service.task;
 
 import com.backend.todolist.dto.projectdto.ProjectOutputDto;
 import com.backend.todolist.dto.searchdto.SearchTaskInputDto;
+import com.backend.todolist.dto.taskdto.DoTaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskDetailOutputDto;
 import com.backend.todolist.dto.taskdto.TaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskOutputDto;
@@ -47,18 +48,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Pagination<TaskOutputDto> getTasksByUserId(Long userId, Pageable pageable, SearchTaskInputDto searchTaskInputDto) {
         Pagination<TaskOutputDto> pagination = new Pagination<>();
-        Page<TaskEntity> taskEntities = taskRepository.searchInUser(userId,
-                searchTaskInputDto.getKeyword() != null ?
-                        searchTaskInputDto.getKeyword() :
-                        "",
-                searchTaskInputDto.getDeadline() != null ?
-                        searchTaskInputDto.getDeadline().withOffsetSameInstant(ZoneOffset.UTC).toLocalDate() :
-                        null,
-                searchTaskInputDto.getStatus() != null ?
-                        searchTaskInputDto.getStatus() :
-                        null,
-                pageable);
-        pagination.setItems(taskEntities.stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
+        Page<TaskEntity> taskEntities = taskRepository.searchInUser(userId, searchTaskInputDto.getKeyword() != null ? searchTaskInputDto.getKeyword() : "", searchTaskInputDto.getDeadline() != null ? searchTaskInputDto.getDeadline().withOffsetSameInstant(ZoneOffset.UTC).toLocalDate() : null, searchTaskInputDto.getStatus() != null ? searchTaskInputDto.getStatus() : null, pageable);
+        pagination.setItems(taskEntities.stream().map(this::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
         pagination.setTotals(taskEntities.getTotalElements());
         return pagination;
     }
@@ -88,21 +79,21 @@ public class TaskServiceImpl implements TaskService {
     public TaskDetailOutputDto getTaskDetailOutputDtoFromTaskEntity(TaskEntity taskEntity) {
         TaskDetailOutputDto taskDetailOutputDto = taskMapper.getTaskDetailOutputDtoFromTaskEntity(taskEntity);
         taskDetailOutputDto.setProject(getProjectById(taskEntity.getProjectId()));
-        if(taskEntity.getCurrentDoingTime() == null) return taskDetailOutputDto;
+        if (taskEntity.getCurrentDoingTime() == null) return taskDetailOutputDto;
         long totalMinutes = taskEntity.getNumberOfPomodoro() * 25;
-        long currentMinutes = taskEntity.getCurrentDoingTime().getTime() / 60000;
-        if(currentMinutes > totalMinutes) currentMinutes = totalMinutes;
+        long currentMinutes = taskEntity.getCurrentDoingTime().getMinutes();
+        if (currentMinutes > totalMinutes) currentMinutes = totalMinutes;
         taskDetailOutputDto.setProgress((double) (currentMinutes * 100 / totalMinutes));
         return taskDetailOutputDto;
     }
 
     @Override
     public TaskOutputDto getTaskOutputDtoFromTaskEntity(TaskEntity taskEntity) {
-        TaskOutputDto taskOutputDto = getTaskOutputDtoFromTaskEntity(taskEntity);
+        TaskOutputDto taskOutputDto = taskMapper.getTaskOutputDtoFromTaskEntity(taskEntity);
         long totalMinutes = taskEntity.getNumberOfPomodoro() * 25;
-        if(taskEntity.getCurrentDoingTime() == null) return taskOutputDto;
-        long currentMinutes = taskEntity.getCurrentDoingTime().getTime() / 60000;
-        if(currentMinutes > totalMinutes) currentMinutes = totalMinutes;
+        if (taskEntity.getCurrentDoingTime() == null) return taskOutputDto;
+        long currentMinutes = taskEntity.getCurrentDoingTime().getMinutes();
+        if (currentMinutes > totalMinutes) currentMinutes = totalMinutes;
         taskOutputDto.setProgress((double) (currentMinutes * 100 / totalMinutes));
         return taskOutputDto;
     }
@@ -134,19 +125,19 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Pagination<TaskOutputDto> getTaskByProjectId(Long userId, Pageable pageable, SearchTaskInputDto search, Long projectId) {
         Pagination<TaskOutputDto> pagination = new Pagination<>();
-        Page<TaskEntity> taskEntities = taskRepository.searchInProject(projectId,
-                search.getKeyword() != null ?
-                        search.getKeyword() :
-                        "",
-                userId,
-                search.getDeadline() != null ?
-                        search.getDeadline().withOffsetSameInstant(ZoneOffset.UTC).toLocalDate() :
-                        null,
-                search.getStatus(),
-                pageable);
-        pagination.setItems(taskEntities.stream().map(taskMapper::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
+        Page<TaskEntity> taskEntities = taskRepository.searchInProject(projectId, search.getKeyword() != null ? search.getKeyword() : "", userId, search.getDeadline() != null ? search.getDeadline().withOffsetSameInstant(ZoneOffset.UTC).toLocalDate() : null, search.getStatus(), pageable);
+        pagination.setItems(taskEntities.stream().map(this::getTaskOutputDtoFromTaskEntity).collect(Collectors.toList()));
         pagination.setTotals(taskEntities.getTotalElements());
         return pagination;
+    }
+
+    @Override
+    public void doTask(Long id, Long userId, DoTaskInputDto doTaskInputDto) {
+        TaskEntity taskEntity = taskRepository.findById(id).orElseThrow(() -> Errors.TASK_NOT_FOUND);
+        if (taskEntity.getStatus() == Status.DONE) throw Errors.TASK_STATUS_IS_DONE;
+        if (taskEntity.getStatus() == Status.TODO) taskEntity.setStatus(Status.IN_PROGRESS);
+        taskEntity.setCurrentDoingTime(doTaskInputDto.getTotalTime());
+        taskRepository.save(taskEntity);
     }
 
     private ProjectOutputDto getProjectById(Long id) {

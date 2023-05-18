@@ -5,6 +5,7 @@ import com.backend.todolist.dto.projectdto.ProjectOutputDto;
 import com.backend.todolist.dto.searchdto.SearchProjectInputDto;
 import com.backend.todolist.entity.ProjectEntity;
 import com.backend.todolist.entity.Status;
+import com.backend.todolist.repository.NoteRepository;
 import com.backend.todolist.repository.ProjectRepository;
 import com.backend.todolist.repository.TaskRepository;
 import com.backend.todolist.response.Pagination;
@@ -22,12 +23,13 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper projectMapper;
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
+    private final NoteRepository noteRepository;
 
-
-    public ProjectServiceImpl(ProjectMapper projectMapper, ProjectRepository projectRepository,/*, TaskService taskService*/TaskRepository taskRepository) {
+    public ProjectServiceImpl(ProjectMapper projectMapper, ProjectRepository projectRepository,/*, TaskService taskService*/TaskRepository taskRepository, NoteRepository noteRepository) {
         this.projectMapper = projectMapper;
         this.projectRepository = projectRepository;
         this.taskRepository = taskRepository;
+        this.noteRepository = noteRepository;
     }
 
     @Override
@@ -80,6 +82,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw Errors.PROJECT_NOT_FOUND;
         }
         taskRepository.deleteByProjectId(projectId);
+        noteRepository.deleteByProjectId(projectId);
         projectRepository.deleteById(projectId);
     }
 

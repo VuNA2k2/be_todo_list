@@ -1,6 +1,7 @@
 package com.backend.todolist.service.task;
 
 import com.backend.todolist.dto.searchdto.SearchTaskInputDto;
+import com.backend.todolist.dto.taskdto.DoTaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskDetailOutputDto;
 import com.backend.todolist.dto.taskdto.TaskInputDto;
 import com.backend.todolist.dto.taskdto.TaskOutputDto;
@@ -21,4 +22,6 @@ public interface TaskService {
     boolean isTaskExist(Long taskId);
 
     Pagination<TaskOutputDto> getTaskByProjectId(Long userId, Pageable pageable, SearchTaskInputDto search, Long projectId);
+
+    void doTask(Long id, Long userId, DoTaskInputDto doTaskInputDto);
 }

@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.net.BindException;
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 public class APIExceptionHandler {
@@ -21,7 +20,7 @@ public class APIExceptionHandler {
         return new Response<>(new ErrorEntity("500", e.getMessage()));
     }
     @ExceptionHandler(BadCredentialsException.class)
-    @ResponseStatus(OK)
+    @ResponseStatus(UNAUTHORIZED)
     public Response<ErrorEntity> handleAuthenticationException(Exception e) {
         return new Response<>(new ErrorEntity("401", e.getMessage()));
     }
