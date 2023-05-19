@@ -137,6 +137,7 @@ public class TaskServiceImpl implements TaskService {
         if (taskEntity.getStatus() == Status.DONE) throw Errors.TASK_STATUS_IS_DONE;
         if (taskEntity.getStatus() == Status.TODO) taskEntity.setStatus(Status.IN_PROGRESS);
         taskEntity.setCurrentDoingTime(doTaskInputDto.getTotalTime());
+        if(doTaskInputDto.getTotalTime().getMinutes() >= taskEntity.getNumberOfPomodoro() * 25) taskEntity.setStatus(Status.DONE);
         taskRepository.save(taskEntity);
     }
 

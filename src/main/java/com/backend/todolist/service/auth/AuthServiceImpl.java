@@ -13,6 +13,7 @@ import com.backend.todolist.service.account.AccountService;
 import com.backend.todolist.service.jwt.JwtService;
 import com.backend.todolist.service.security.SecurityService;
 import com.backend.todolist.service.user.UserService;
+import com.backend.todolist.utils.exception.Errors;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -45,16 +46,24 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginOutputDto login(LoginInputDto loginInputDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginInputDto.getUsername(),
-                        loginInputDto.getPassword()
-                )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtService.generateToken((UserDetailEntity) authentication.getPrincipal());
-        String refreshJwt = jwtService.generateRefreshToken((UserDetailEntity) authentication.getPrincipal());
-        return new LoginOutputDto(jwt, refreshJwt);
+        if(accountService.isAccountExist(loginInputDto.getUsername())) {
+            String encodePassword = accountService.getAccount(loginInputDto.getUsername()).getPassword();
+            if(!passwordEncoder.matches(loginInputDto.getPassword(), encodePassword))
+                throw Errors.USERNAME_OR_PASSWORD_INCORRECT;
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginInputDto.getUsername(),
+                            loginInputDto.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtService.generateToken((UserDetailEntity) authentication.getPrincipal());
+            String refreshJwt = jwtService.generateRefreshToken((UserDetailEntity) authentication.getPrincipal());
+            return new LoginOutputDto(jwt, refreshJwt);
+        } else {
+            throw Errors.USERNAME_OR_PASSWORD_INCORRECT;
+        }
+
     }
 
 

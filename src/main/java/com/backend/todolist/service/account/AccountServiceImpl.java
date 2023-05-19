@@ -66,4 +66,14 @@ public class AccountServiceImpl implements AccountService {
     public AccountEntity getEntityFromInput(AccountInputDto inputDto) {
         return accountMapper.getEntityFromInput(inputDto);
     }
+
+    @Override
+    public boolean isAccountExist(String userName) {
+        return accountRepository.existsAccountEntitiesByUsername(userName);
+    }
+
+    @Override
+    public boolean existAccount(String username, String password) {
+        return accountRepository.existsAccountEntitiesByUsernameAndPassword(username, password);
+    }
 }

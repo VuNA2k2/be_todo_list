@@ -21,4 +21,8 @@ public interface AccountService {
     AccountOutputDto getOutputFromEntity(AccountEntity entity);
 
     AccountEntity getEntityFromInput(AccountInputDto inputDto);
+
+    boolean isAccountExist(String userName);
+
+    boolean existAccount(String userName, String password);
 }

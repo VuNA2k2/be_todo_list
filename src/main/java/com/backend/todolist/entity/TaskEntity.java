@@ -31,7 +31,6 @@ public class TaskEntity {
     private OffsetDateTime deadline;
     @Column(name = "current_doing_time")
     private Time currentDoingTime = Time.valueOf("00:00:00");
-    private boolean reminder;
     @Enumerated(EnumType.STRING)
     private Status status;
 }
